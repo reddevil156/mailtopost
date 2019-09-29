@@ -301,7 +301,7 @@ class pop3
 					if ($this->PutLine("CAPA")==0)
 					{
 						return ($this->SetError("Could not send the CAPA command"));
-					]
+					}
 					$response=$this->GetLine();
 					if (gettype($response)!="string")
 					{
