@@ -1,0 +1,146 @@
+imports:
+    - { resource: tables.yml }
+    - { resource: phpbb_tables.yml }
+
+services:
+    david63.mailtopost.listener:
+        class: david63\mailtopost\event\listener
+        arguments:
+            - '@config'
+            - '@david63.mailtopost.acp_user.controller'
+            - '@david63.mailtopost.core.mailtopost'
+        tags:
+            - { name: event.listener }
+
+    david63.mailtopost.acp_user.controller:
+        class: david63\mailtopost\controller\acp_user_controller
+        arguments:
+            - '@request'
+            - '@dbal.conn'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '@template'
+            - '@language'
+            - '@david63.mailtopost.core.functions'
+            - '%tables%'
+
+    david63.mailtopost.admin.manage.controller:
+        class: david63\mailtopost\controller\admin_manage_controller
+        arguments:
+            - '@config'
+            - '@request'
+            - '@template'
+            - '@user'
+            - '@language'
+            - '@log'
+            - '@david63.mailtopost.core.functions'
+
+    david63.mailtopost.admin.actions.controller:
+        class: david63\mailtopost\controller\admin_actions_controller
+        arguments:
+            - '@config'
+            - '@request'
+            - '@user'
+            - '@cache'
+            - '@template'
+            - '@language'
+            - '@dbal.conn'
+            - '%david63.mailtopost.tables.mailtopost_log%'
+            - '@david63.mailtopost.core.functions'
+            - '@david63.mailtopost.pop3mail.pop3'
+            - '@david63.mailtopost.core.mailtopost'
+
+    david63.mailtopost.log.controller:
+        class: david63\mailtopost\controller\log_controller
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@request'
+            - '@template'
+            - '@pagination'
+            - '@user'
+            - '%david63.mailtopost.tables.mailtopost_log%'
+            - '@language'
+            - '@david63.mailtopost.core.functions'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    david63.mailtopost.ucp.controller:
+        class: david63\mailtopost\controller\ucp_controller
+        arguments:
+            - '@config'
+            - '@user'
+            - '@dbal.conn'
+            - '@request'
+            - '@language'
+            - '@template'
+            - '@david63.mailtopost.core.functions'
+            - '%tables%'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    david63.mailtopost.cron.task.mailtopost_process:
+        class: david63\mailtopost\cron\task\mailtopost_process
+        arguments:
+            - '@config'
+            - '@david63.mailtopost.core.mailtopost'
+        calls:
+            - [set_name, [cron.task.mailtopost_process]]
+        tags:
+            - { name: cron.task }
+
+    david63.mailtopost.cron.task.mailtopost_log_prune:
+        class: david63\mailtopost\cron\task\mailtopost_log_prune
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@log'
+            - '@user'
+            - '%david63.mailtopost.tables.mailtopost_log%'
+        calls:
+            - [set_name, [cron.task.mailtopost_log_prune]]
+        tags:
+            - { name: cron.task }
+
+    david63.mailtopost.core.mailtopost:
+        class: david63\mailtopost\core\mailtopost
+        arguments:
+            - '@config'
+            - '@auth'
+            - '@request'
+            - '@user'
+            - '@language'
+            - '@log'
+            - '@dbal.conn'
+            - '@david63.mailtopost.core.functions'
+            - '%tables%'
+            - '%david63.mailtopost.tables.mailtopost_log%'
+            - '@david63.mailtopost.pop3mail.pop3'
+            - '@david63.mailtopost.pop3mail.mime_parser'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    david63.mailtopost.core.functions:
+        class: david63\mailtopost\core\functions
+        arguments:
+            - '@config'
+            - '@language'
+            - '@ext.manager'
+            - '@dbal.conn'
+            - '%tables%'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    david63.mailtopost.pop3mail.pop3:
+        class: david63\mailtopost\pop3mail\pop3
+        arguments:
+            - '@config'
+
+    david63.mailtopost.pop3mail.mime_parser:
+        class: david63\mailtopost\pop3mail\mime_parser
+        arguments:
+            - '@david63.mailtopost.pop3mail.rfc822_addresses'
+
+    david63.mailtopost.pop3mail.rfc822_addresses:
+        class: david63\mailtopost\pop3mail\rfc822_addresses
+        arguments:

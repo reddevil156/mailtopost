@@ -1,0 +1,39 @@
+{
+	"name": "david63/mailtopost",
+	"type": "phpbb-extension",
+	"description": "Adds a feature to receive posts via an email.",
+	"version": "2.1.0-b1",
+	"time": "2019-09-11",
+	"keywords": [
+		"phpbb",
+		"extension",
+		"email",
+		"post"
+	],
+	"license": "GPL-2.0-only",
+	"authors": [
+		{
+			"name": "David Wood",
+			"role": "Extension Developer"
+		},
+		{
+			"name": "Manuel Lemos",
+			"role": "Author - POP3 e-mail client scripts"
+		}
+    ],
+	"require": {
+        "php": ">=5.4.0",
+        "composer/installers": "~1.0"
+    },
+	"extra": {
+		"display-name": "[*] Mail to post",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.2.7"
+		},
+		"version-check": {
+        	"host": "version.phpbbdev.space",
+        	"directory": "/3.2",
+        	"filename": "/mailtopost_version_file.json"
+    	}
+	}
+}

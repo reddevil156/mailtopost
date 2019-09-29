@@ -1,0 +1,201 @@
+{% include '@' ~ NAMESPACE ~ '/head_panel.html' %}
+
+{% if EMAIL_REUSE %}
+	<div class="head-panel-error">
+		<div class="head-title">{{ lang('WARNING') }}</div>
+		<div class="head-description">{{ lang('EMAIL_REUSE') }}</div>
+	</div>
+{% endif %}
+
+<form id="creditspage_manage" method="post" action="{{ U_ACTION }}">
+	<fieldset>
+		<legend>{{ lang('MAIL_OPTIONS') }}</legend>
+
+		<dl>
+			<dt><label for="mtp_board_email">{{ lang('MTP_BOARD_EMAIL') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_BOARD_EMAIL_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_board_email" type="text" id="mtp_board_email" value="{{ MTP_BOARD_EMAIL }}" size="40" maxlength="255" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_hostname">{{ lang('MTP_HOSTNAME') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_HOSTNAME_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_hostname" type="text" id="mtp_hostname" value="{{ MTP_HOSTNAME }}" size="40" maxlength="255" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_user">{{ lang('MTP_USER') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_USER_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_user" type="text" id="mtp_user" value="{{ MTP_USER }}" size="40" maxlength="255" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_password">{{ lang('MTP_PASSWORD') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_PASSWORD_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_password" type="text" id="mtp_password" value="{{ MTP_PASSWORD }}" size="40" maxlength="255" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_port">{{ lang('MTP_PORT') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_PORT_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_port" type="text" id="mtp_port" value="{{ MTP_PORT }}" size="3" maxlength="3" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_tls">{{ lang('MTP_TLS') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_TLS_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_tls1" name="mtp_tls" value="1"{% if MTP_TLS %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_tls1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_tls0" name="mtp_tls" value="0"{% if not MTP_TLS %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_tls0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_apop">{{ lang('MTP_APOP') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_APOP_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_apop1" name="mtp_apop" value="1"{% if MTP_APOP %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_apop1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_apop0" name="mtp_apop" value="0"{% if not MTP_APOP %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_apop0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_realm">{{ lang('MTP_REALM') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_REALM_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_realm" type="text" id="mtp_realm" value="{{ MTP_REALM }}" size="40" maxlength="255" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_workstation">{{ lang('MTP_WORKSTATION') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_WORKSTATION_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_workstation" type="text" id="mtp_workstation" value="{{ MTP_WORKSTATION }}" size="40" maxlength="255" validate="string" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_authentication">{{ lang('MTP_AUTHENTICATION') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_AUTHENTICATION_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_authentication" type="text" id="mtp_authentication" value="{{ MTP_AUTHENTICATION }}" size="10" maxlength="50" validate="string" />
+			</dd>
+		</dl>
+
+		<hr>
+
+		<dl>
+			<dt><label for="mtp_debug">{{ lang('MTP_DEBUG') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_DEBUG_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_debug1" name="mtp_debug" value="1"{% if MTP_DEBUG %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_debug1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_debug0" name="mtp_debug" value="0"{% if not MTP_DEBUG %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_debug0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{{ lang('POST_OPTIONS') }}</legend>
+
+		<dl>
+			<dt><label for="mtp_process_frequency">{{ lang('MTP_CRON_FREQUENCY') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_CRON_FREQUENCY_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_process_frequency" type="number" id="mtp_process_frequency" value="{{ MTP_CRON_FREQUENCY }}" min="0" max="60" />&nbsp;&nbsp;{{ MTP_INTERVAL_TYPE }}
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_next_cron">{{ lang('MTP_NEXT_CRON') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_NEXT_CRON_EXPLAIN') }}</span></dt>
+			<dd>
+				<span class="textbox">{{ NEXT_CRON_PROCESS }}</span>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_default_forum">{{ lang('MTP_DEFAULT_FORUM') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_DEFAULT_FORUM_EXPLAIN') }}</span></dt>
+			<dd><select name="mtp_default_forum" id="mtp_default_forum"><option value="0">{{ lang('SELECT_FORUM') }}</option>{{ MTP_DEFAULT_FORUM }}</select>&nbsp;&nbsp;{{ lang('MTP_REQUIRED') }}</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_use_default_forum">{{ lang('MTP_USE_DEFAULT_FORUM') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_USE_DEFAULT_FORUM_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_use_default_forum1" name="mtp_use_default_forum" value="1"{% if MTP_USE_DEFAULT_FORUM %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_use_default_forum1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_use_default_forum0" name="mtp_use_default_forum" value="0"{% if not MTP_USE_DEFAULT_FORUM %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_use_default_forum0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_moderate">{{ lang('MTP_MODERATE') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_MODERATE_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_moderate0" name="mtp_moderate" value="0"{% if not MTP_MODERATE %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_moderate0">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_moderate1" name="mtp_moderate" value="1"{% if MTP_MODERATE %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_moderate1">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_new_topic">{{ lang('MTP_NEW_TOPIC') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_NEW_TOPIC_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_new_topic1" name="mtp_new_topic" value="1"{% if MTP_NEW_TOPIC %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_new_topic1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_new_topic0" name="mtp_new_topic" value="0"{% if not MTP_NEW_TOPIC %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_new_topic0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_post_date">{{ lang('MTP_POST_DATE') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_POST_DATE_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_post_date0" name="mtp_post_date" value="0"{% if not MTP_POST_DATE %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_post_date0">{{ lang('MTP_MAIL_DATE') }}</label>
+				<input type="radio" id="mtp_post_date1" name="mtp_post_date" value="1"{% if MTP_POST_DATE %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_post_date1">{{ lang('MTP_DATE_POST') }}</label>
+			</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{{ lang('LOG_OPTIONS') }}</legend>
+
+		<dl>
+			<dt><label for="mtp_log_days">{{ lang('MTP_LOG_DAYS') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_LOG_DAYS_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_log_days" type="number" id="mtp_log_days" value="{{ MTP_LOG_DAYS }}" min="0" max="99" />&nbsp;{{ lang('DAYS') }}
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_next_log_prune">{{ lang('MTP_NEXT_LOG_PRUNE') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_NEXT_LOG_PRUNE_EXPLAIN') }}</span></dt>
+			<dd>
+				<span class="textbox">{{ NEXT_LOG_PRUNE }}</span>
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_log_items_page">{{ lang('MTP_LOG_ITEMS_PAGE') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_LOG_ITEMS_PAGE_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="textbox" name="mtp_log_items_page" type="number" id="mtp_log_items_page" value="{{ MTP_LOG_ITEMS_PAGE }}" min="1" max="99" />
+			</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{{ lang('ACP_SUBMIT_CHANGES') }}</legend>
+		<p class="submit-buttons">
+			<input class="adm-button" type="submit" id="submit" name="submit" value="{{ lang('SUBMIT') }}" />&nbsp;
+			<input class="adm-button" type="reset" id="reset" name="reset" value="{{ lang('RESET') }}" />
+		</p>
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
+
+{% include '@' ~ NAMESPACE ~ '/donate.html' %}

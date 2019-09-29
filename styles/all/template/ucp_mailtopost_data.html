@@ -1,0 +1,64 @@
+{% include 'ucp_header.html' %}
+
+<h2>
+	{{ lang('UCP_MAILTOTOPIC_TITLE') }}
+	<br>
+</h2>
+
+<div class="panel">
+	<div class="inner">
+		<p>{{ lang('UCP_MAILTOTOPIC_EXPLAIN') }}</p>
+		<hr>
+		{% if ERROR %}
+			<dl>
+				<dd class="error">{{ ERROR_MESSAGE }}</dd>
+				<hr>
+			</dl>
+		{% endif %}
+	</div>
+
+	<form id="mailtotopic_data" method="post" action="{{ S_UCP_ACTION }}">
+		<fieldset>
+			<dl>
+				<p>
+					{{ lang('PLEASE_READ') }}<br>{{ lang('MAILTOTOPIC_EXPLAIN') }}
+					{% if not S_USE_DEFAULT_FORUM %}
+						{{ lang('MAILTOTOPIC_EXPLAIN2') }}
+					{% else %}
+						{{ lang('MAILTOTOPIC_FORUM_EXPLAIN') }}
+					{% endif %}
+				</p>
+				<hr>
+			<dl>
+				<dt><label for="your_email">{{ lang('YOUR_EMAIL') }}{{ lang('COLON') }}</label></dt>
+				<dd>{{ USER_EMAIL }}</dd>
+			</dl>
+
+			<dl>
+				<dt><label for="board_email">{{ lang('BOARD_EMAIL') }}{{ lang('COLON') }}</label></dt>
+				<dd>{{ BOARD_EMAIL }}</dd>
+			</dl>
+
+			{% if S_USE_DEFAULT_FORUM %}
+				<dl>
+					<dt><label for="board_email">{{ lang('DEFAULT_FORUM') }}{{ lang('COLON') }}</label></dt>
+					<dd>{{ DEFAULT_FORUM }}</dd>
+				</dl>
+			{% endif %}
+
+			{% if not S_USE_DEFAULT_FORUM %}
+				<dl>
+					<dt><label for="forum_select">{{ lang('FORUM_SELECT') }}{{ lang('COLON') }}</label><br><span>{{ lang('FORUM_SELECT_EXPLAIN') }}</span></dt>
+					<dd><select name="user_mtp_forum" id="user_mtp_forum"><option value="0">{{ lang('SELECT_FORUM') }}</option>{{ FORUM_SELECT }}</select></dd>
+				</dl>
+			</fieldset>
+
+			<fieldset class="submit-buttons">
+				<input type="submit" name="submit" value="{{ lang('SUBMIT') }}" class="button1" />
+				{{ S_FORM_TOKEN }}
+			{% endif %}
+		</fieldset>
+	</form>
+</div>
+
+{% include 'ucp_footer.html' %}

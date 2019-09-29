@@ -1,0 +1,16 @@
+<form id="mtp_settings" method="post" action="{{ U_ACTION }}"{{ S_FORM_ENCTYPE }}>
+
+	<fieldset>
+		<legend>{{ lang('MTP_FORUM') }}</legend>
+
+		<dl>
+			<dt><label for="forum_select">{{ lang('FORUM_SELECT') }}{{ lang('COLON') }}</label><br><span>{{ lang('FORUM_SELECT_EXPLAIN') }}</span></dt>
+			<dd><select name="user_mtp_forum" id="user_mtp_forum"><option value="0">{{ lang('SELECT_FORUM') }}</option>{{ FORUM_SELECT }}</select></dd>
+		</dl>
+	</fieldset>
+
+	<fieldset class="quick">
+		<input type="submit" name="update" value="{{ lang('SUBMIT') }}" class="button1" />
+		{{ S_FORM_TOKEN }}
+	</fieldset>
+</form>
