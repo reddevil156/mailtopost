@@ -120,16 +120,19 @@ class mime_parser
 	function SetPositionedWarning($error, $position)
 	{
 		if (!$this->ignore_syntax_errors)
+		{
 			return ($this->SetPositionedError($error, $position));
+		}
 		$this->warnings[$position]=$error;
 		return (1);
 	}
 
 	function SetPHPError($error, &$php_error_message)
 	{
-		if (isset($php_error_message)
-		&& strlen($php_error_message))
+		if (isset($php_error_message) && strlen($php_error_message))
+		{
 			$error .= ': '.$php_error_message;
+		}
 		return ($this->SetError($error));
 	}
 
@@ -168,7 +171,9 @@ class mime_parser
 		for ($character=0; $character<strlen($separator); $character++)
 		{
 			if (gettype($position=strpos($string,$separator[$character]))=='integer')
+			{
 				$found=(isset($found) ? min($found,$position) : $position);
+			}
 		}
 		if (isset($found))
 		{
@@ -191,28 +196,27 @@ class mime_parser
 		{
 			$parameter = trim(strtolower($this->Tokenize($p, '=')));
 			$remaining = trim($this->Tokenize(''));
-			if (strlen($remaining)
-			&& !strcmp($remaining[0], '"')
-			&& (gettype($quote = strpos($remaining, '"', 1)) == 'integer'))
+			if (strlen($remaining) && !strcmp($remaining[0], '"') && (gettype($quote = strpos($remaining, '"', 1)) == 'integer'))
 			{
 				$value = substr($remaining, 1, $quote - 1);
 				$p = trim(substr($remaining, $quote + 1));
-				if (strlen($p) > 0
-				&& !strcmp($p[0], ';'))
+				if (strlen($p) > 0 && !strcmp($p[0], ';'))
+				{
 					$p = substr($p, 1);
+				}
 			}
 			else
 			{
 				$value = trim($this->Tokenize($remaining, ';'));
 				$p = trim($this->Tokenize(''));
 			}
-			if (($l=strlen($parameter))
-			&& !strcmp($parameter[$l - 1],'*'))
+			if (($l=strlen($parameter)) && !strcmp($parameter[$l - 1],'*'))
 			{
 				$parameter=$this->Tokenize($parameter, '*');
-				if (isset($parameters[$parameter])
-				&& isset($character_sets[$parameter]))
+				if (isset($parameters[$parameter]) && isset($character_sets[$parameter]))
+				{
 					$value = $parameters[$parameter] . UrlDecode($value);
+				}
 				else
 				{
 					$character_sets[$parameter] = strtolower($this->Tokenize($value, '\''));
@@ -237,8 +241,7 @@ class mime_parser
 					return (1);
 				}
 			}
-			if ($line_break>$position
-			&& $string[$line_break-1]=="\r")
+			if ($line_break>$position && $string[$line_break-1]=="\r")
 			{
 				$line_break--;
 				$break="\r\n";
@@ -261,9 +264,10 @@ class mime_parser
 					return (1);
 				}
 			}
-			if (($n = $line_break + 1) < strlen($this->buffer)
-			&& $this->buffer[$n]=="\n")
+			if (($n = $line_break + 1) < strlen($this->buffer) && $this->buffer[$n]=="\n")
+			{
 				$break="\r\n";
+			}
 			return (1);
 		}
 		return (gettype($line_break=strpos($this->buffer, $break="\n", $position))=='integer');
@@ -282,9 +286,10 @@ class mime_parser
 					return (1);
 				}
 			}
-			if (($n = $line_break + 1) < strlen($this->body_buffer)
-			&& $this->body_buffer[$n]=="\n")
+			if (($n = $line_break + 1) < strlen($this->body_buffer) && $this->body_buffer[$n]=="\n")
+			{
 				$break="\r\n";
+			}
 			return (1);
 		}
 		return (gettype($line_break=strpos($this->body_buffer, $break="\n", $position))=='integer');
@@ -307,7 +312,9 @@ class mime_parser
 				$position = $l;
 			}
 			if (strlen($line)==0)
+			{
 				break;
+			}
 			$h = strtolower(strtok($line,':'));
 			$headers[$h] = trim(strtok(''));
 		}
@@ -329,9 +336,7 @@ class mime_parser
 				if ($this->FindLineBreak($this->buffer_position, $break, $line_break))
 				{
 					$next = $line_break + strlen($break);
-					if (!strcmp($break,"\r")
-					&& strlen($this->buffer) == $next
-					&& !$end)
+					if (!strcmp($break,"\r") && strlen($this->buffer) == $next && !$end)
 					{
 						$need_more_data = 1;
 						break;
@@ -362,7 +367,9 @@ class mime_parser
 							}
 						default:
 							if (!$this->SetPositionedWarning('message headers do not end with empty line', $this->buffer_position))
+							{
 								return (0);
+							}
 							$part=array(
 								'Type'=>'BodyStart',
 								'Position'=>$this->offset + $this->buffer_position
@@ -422,8 +429,7 @@ class mime_parser
 						else
 						{
 							$character = $this->buffer[$next];
-							if (!strcmp($character, ' ')
-							|| !strcmp($character, "\t"))
+							if (!strcmp($character, ' ') || !strcmp($character, "\t"))
 							{
 								$value .= $line;
 								$position = $next;
@@ -473,8 +479,7 @@ class mime_parser
 					{
 						$next = $line_break + strlen($break);
 						$following = $next + strlen($break);
-						if ($following >= strlen($this->buffer)
-						|| gettype($line=strpos($this->buffer, $break, $following))!='integer')
+						if ($following >= strlen($this->buffer) || gettype($line=strpos($this->buffer, $break, $following))!='integer')
 						{
 							if (!$end)
 							{
@@ -559,8 +564,7 @@ class mime_parser
 						$need_more_data = !$end;
 						if (!$end_line)
 						{
-							if (gettype($line_break=strrpos($data, "\n"))=='integer'
-							|| gettype($line_break=strrpos($data, "\r"))=='integer')
+							if (gettype($line_break=strrpos($data, "\n"))=='integer' || gettype($line_break=strrpos($data, "\r"))=='integer')
 							{
 								$line_break++;
 								$this->buffer_position -= strlen($data) - $line_break;
@@ -599,11 +603,17 @@ class mime_parser
 		for (;;)
 		{
 			if (!$this->body_parser->GetPart($part,$end))
+			{
 				return ($this->SetError($this->body_parser->error));
+			}
 			if ($end)
+			{
 				return (1);
+			}
 			if (!isset($part['Part']))
+			{
 				$part['Part']=$this->headers['Boundary'];
+			}
 			$this->parts[]=$part;
 		}
 	}
@@ -619,13 +629,15 @@ class mime_parser
 			$parameter = trim(strtolower(strtok($values, '=')));
 			$value = trim(strtok(';'));
 			$l = strlen($value);
-			if ($l > 1
-			&& !strcmp($value[0], '"')
-			&& !strcmp($value[$l - 1], '"'))
+			if ($l > 1 && !strcmp($value[0], '"') && !strcmp($value[$l - 1], '"'))
+			{
 				$value = substr($value, 1, $l - 2);
+			}
 			$parameters[$parameter] = $value;
 			if (!strcmp($parameter, $return))
+			{
 				$return_value = $value;
+			}
 			$values = trim(strtok(''));
 		}
 		return ($return_value);
@@ -643,7 +655,9 @@ class mime_parser
 		if (!$success)
 		{
 			if (($this->error_position = $this->body_parser->error_position) != -1)
+			{
 				 $this->body_parser->error_position += $offset + $this->body_parser->message_position;
+			}
 			return ($this->SetError($this->body_parser->error));
 		}
 		return (1);
@@ -658,7 +672,9 @@ class mime_parser
 				break;
 			case 'HeaderName':
 				if ($this->decode_bodies)
+				{
 					$this->current_header = strtolower($part['Name']);
+				}
 				break;
 			case 'HeaderValue':
 				if ($this->decode_headers)
@@ -672,7 +688,9 @@ class mime_parser
 							if ($position<strlen($value))
 							{
 								if (count($decoded_header))
+								{
 									$decoded_header[count($decoded_header)-1]['Value'].=substr($value, $position);
+								}
 								else
 								{
 									$decoded_header[]=array(
@@ -708,7 +726,9 @@ class mime_parser
 						if ($encoded > $position)
 						{
 							if (count($decoded_header))
+							{
 								$decoded_header[count($decoded_header)-1]['Value'].=substr($value, $position, $encoded - $position);
+							}
 							else
 							{
 								$decoded_header[]=array(
@@ -728,8 +748,7 @@ class mime_parser
 										{
 											case '=':
 												$h = HexDec($hex = strtolower(substr($value, $position+1, 2)));
-												if ($end - $position < 3
-												|| strcmp(sprintf('%02x', $h), $hex))
+												if ($end - $position < 3 || strcmp(sprintf('%02x', $h), $hex))
 												{
 													$warning = 'the header specified an invalid encoded character';
 													$warning_position = $part['Position'] + $position + 1;
@@ -762,9 +781,7 @@ class mime_parser
 												break;
 										}
 									}
-									if (count($decoded_header)
-									&& (!strcmp($decoded_header[$last = count($decoded_header)-1]['Encoding'], 'ASCII')
-									|| !strcmp($decoded_header[$last]['Encoding'], $encoding)))
+									if (count($decoded_header) && (!strcmp($decoded_header[$last = count($decoded_header)-1]['Encoding'], 'ASCII') || !strcmp($decoded_header[$last]['Encoding'], $encoding)))
 									{
 										$decoded_header[$last]['Value'].= $decoded;
 										$decoded_header[$last]['Encoding']= $encoding;
@@ -780,14 +797,14 @@ class mime_parser
 								break;
 							case 'b':
 								$decoded=base64_decode(substr($value, $start, $end - $start));
-								if ($end <= $start
-								|| gettype($decoded) != 'string'
-								|| strlen($decoded) == 0)
+								if ($end <= $start || gettype($decoded) != 'string' || strlen($decoded) == 0)
 								{
 									$warning = 'the header specified an invalid base64 encoded text';
 									$warning_position = $part['Position'] + $start;
 									if ($this->ignore_syntax_errors)
+									{
 										$this->SetPositionedWarning($warning, $warning_position);
+									}
 									else
 									{
 										$error = $warning;
@@ -795,9 +812,7 @@ class mime_parser
 										break 2;
 									}
 								}
-								if (count($decoded_header)
-								&& (!strcmp($decoded_header[$last = count($decoded_header)-1]['Encoding'], 'ASCII')
-								|| !strcmp($decoded_header[$last]['Encoding'], $encoding)))
+								if (count($decoded_header) && (!strcmp($decoded_header[$last = count($decoded_header)-1]['Encoding'], 'ASCII') || !strcmp($decoded_header[$last]['Encoding'], $encoding)))
 								{
 									$decoded_header[$last]['Value'].= $decoded;
 									$decoded_header[$last]['Encoding']= $encoding;
@@ -817,14 +832,16 @@ class mime_parser
 						}
 						$position = $end + 2;
 						if (($space = strspn($value, " \t", $position)) > 0)
+						{
 							$position += $space - 1;
+						}
 					}
-					if (strlen($error)==0
-					&& count($decoded_header))
+					if (strlen($error)==0 && count($decoded_header))
+					{
 						$part['Decoded']=$decoded_header;
+					}
 				}
-				if ($this->decode_bodies
-				|| $this->decode_headers)
+				if ($this->decode_bodies || $this->decode_headers)
 				{
 					switch ($this->current_header)
 					{
@@ -840,9 +857,13 @@ class mime_parser
 							{
 								$this->headers['Multipart'] = 1;
 								if (strlen($boundary))
+								{
 									$this->headers['Boundary'] = $boundary;
+								}
 								else
+								{
 									return ($this->SetPositionedError('multipart content-type header does not specify the boundary parameter', $part['Position']));
+								}
 							}
 							break;
 						case 'content-transfer-encoding:':
@@ -854,7 +875,9 @@ class mime_parser
 								case '7 bit':
 								case '8 bit':
 									if (!$this->SetPositionedWarning('"'.$this->headers['Encoding'].'" is an incorrect content transfer encoding type', $part['Position']))
+									{
 										return (0);
+									}
 								case '7bit':
 								case '8bit':
 								case 'binary':
@@ -864,15 +887,16 @@ class mime_parser
 									break;
 								default:
 									if (!$this->SetPositionedWarning('decoding '.$this->headers['Encoding'].' encoded bodies is not yet supported', $part['Position']))
+									{
 										return (0);
+									}
 							}
 							break;
 					}
 				}
 				break;
 			case 'BodyStart':
-				if ($this->decode_bodies
-				&& isset($this->headers['Multipart']))
+				if ($this->decode_bodies && isset($this->headers['Multipart']))
 				{
 					$this->body_parser_state = MIME_PARSER_BODY_START;
 					$this->body_buffer = '';
@@ -880,14 +904,16 @@ class mime_parser
 				}
 				break;
 			case 'MessageEnd':
-				if ($this->decode_bodies
-				&& isset($this->headers['Multipart'])
-				&& $this->body_parser_state != MIME_PARSER_BODY_DONE)
+				if ($this->decode_bodies && isset($this->headers['Multipart']) && $this->body_parser_state != MIME_PARSER_BODY_DONE)
 				{
 					if ($this->body_parser_state != MIME_PARSER_BODY_DATA)
+					{
 						return ($this->SetPositionedError('incomplete message body part', $part['Position']));
+					}
 					if (!$this->SetPositionedWarning('truncated message body part', $part['Position']))
+					{
 						return (0);
+					}
 				}
 				break;
 			case 'BodyData':
@@ -909,7 +935,9 @@ class mime_parser
 								for ($position = $this->body_buffer_position;;)
 								{
 									if (!$this->FindBodyLineBreak($position, $break, $line_break))
+									{
 										return (1);
+									}
 									$next = $line_break + strlen($break);
 									if (!strcmp(rtrim(substr($this->body_buffer, $position, $line_break - $position)), $boundary))
 									{
@@ -944,9 +972,13 @@ class mime_parser
 										if ($position > 0)
 										{
 											if (!$this->ParseBody(substr($this->body_buffer, 0, $position), 0, $this->body_offset))
+											{
 												return (0);
+											}
 											if (!$this->QueueBodyParts())
+											{
 												return (0);
+											}
 										}
 										$this->body_buffer = substr($this->body_buffer, $position);
 										$this->body_buffer_position = 0;
@@ -958,9 +990,13 @@ class mime_parser
 									if (!strcmp($line, $boundary.'--'))
 									{
 										if (!$this->ParseBody(substr($this->body_buffer, 0, $position), 1, $this->body_offset))
+										{
 											return (0);
+										}
 										if (!$this->QueueBodyParts())
+										{
 											return (0);
+										}
 										$part=array(
 											'Type'=>'EndPart',
 											'Part'=>$this->headers['Boundary'],
@@ -975,9 +1011,13 @@ class mime_parser
 									else if (!strcmp($line, $boundary))
 									{
 										if (!$this->ParseBody(substr($this->body_buffer, 0, $position), 1, $this->body_offset))
+										{
 											return (0);
+										}
 										if (!$this->QueueBodyParts())
+										{
 											return (0);
+										}
 										$part=array(
 											'Type'=>'EndPart',
 											'Part'=>$this->headers['Boundary'],
@@ -1033,14 +1073,16 @@ class mime_parser
 								case 2:
 									$decoded .= substr($this->body_buffer, $position, $equal - $position);
 									if (!strcmp($this->body_buffer[$next],"\n"))
+									{
 										$position = $end;
+									}
 									else
+									{
 										$position = $equal;
+									}
 									break 2;
 							}
-							if (!strcmp(substr($this->body_buffer, $next, 2), $break="\r\n")
-							|| !strcmp($this->body_buffer[$next], $break="\n")
-							|| !strcmp($this->body_buffer[$next], $break="\r"))
+							if (!strcmp(substr($this->body_buffer, $next, 2), $break="\r\n") || !strcmp($this->body_buffer[$next], $break="\n") || !strcmp($this->body_buffer[$next], $break="\r"))
 							{
 								$decoded .= substr($this->body_buffer, $position, $equal - $position);
 								$position = $next + strlen($break);
@@ -1051,7 +1093,9 @@ class mime_parser
 							if (strcmp(sprintf('%02x', $h), $hex))
 							{
 								if (!$this->SetPositionedWarning('the body specified an invalid quoted-printable encoded character', $this->body_offset + $next))
+								{
 									return (0);
+								}
 								$decoded.='=';
 								$position=$next;
 							}
@@ -1099,30 +1143,40 @@ class mime_parser
 		for (;;)
 		{
 			if (!$this->GetPart($part, $end))
+			{
 				return (0);
+			}
 			if ($end)
 			{
 				if (isset($parameters['File']))
 				{
 					$end_of_data = feof($this->file);
 					if ($end_of_data)
+					{
 						break;
+					}
 					$data = @fread($this->file, $this->message_buffer_length);
 					if (gettype($data)!='string')
+					{
 						return ($this->SetPHPError('could not read the message file', $php_errormsg));
+					}
 					$end_of_data = feof($this->file);
 				}
 				else
 				{
 					$end_of_data=($this->position>=strlen($parameters['Data']));
 					if ($end_of_data)
+					{
 						break;
+					}
 					$data = substr($parameters['Data'], $this->position, $this->message_buffer_length);
 					$this->position += strlen($data);
 					$end_of_data = ($this->position >= strlen($parameters['Data']));
 				}
 				if (!$this->Parse($data, $end_of_data))
+				{
 					return (0);
+				}
 				continue;
 			}
 			$type = $part['Type'];
@@ -1168,25 +1222,28 @@ class mime_parser
 							{
 								$h = 0;
 								$decoded['Headers'][$header]=$value;
-								if ($this->extract_addresses
-								&& isset($this->address_headers[$header]))
+								if ($this->extract_addresses && isset($this->address_headers[$header]))
+								{
 									$decoded['HeaderPositions'][$header] = $part['Position'];
+								}
 							}
 							else if (gettype($decoded['Headers'][$header])=='string')
 							{
 								$h = 1;
 								$decoded['Headers'][$header]=array($decoded['Headers'][$header], $value);
-								if ($this->extract_addresses
-								&& isset($this->address_headers[$header]))
+								if ($this->extract_addresses && isset($this->address_headers[$header]))
+								{
 									$decoded['HeaderPositions'][$header] = array($decoded['HeaderPositions'][$header], $part['Position']);
+								}
 							}
 							else
 							{
 								$h = count($decoded['Headers'][$header]);
 								$decoded['Headers'][$header][]=$value;
-								if ($this->extract_addresses
-								&& isset($this->address_headers[$header]))
+								if ($this->extract_addresses && isset($this->address_headers[$header]))
+								{
 									$decoded['HeaderPositions'][$header][] = $part['Position'];
+								}
 							}
 							if (isset($part['Decoded'])
 							&& (count($part['Decoded'])>1
@@ -1657,7 +1714,9 @@ class mime_parser
 			fclose($file);
 		}
 		else
+		{
 			$body = '';
+		}
 		return (1);
 	}
 
@@ -1668,10 +1727,10 @@ class mime_parser
 		{
 			$content_type = 'text/plain';
 		}
-// Count???????
 		else if (count($message['Headers']['content-type:']) == 1)
+		{
 			$content_type = $message['Headers']['content-type:'];
-// **********************
+		}
 		else
 		{
 			if (!$this->SetPositionedWarning('message contains multiple content-type headers', $message['Position']))
@@ -2002,7 +2061,9 @@ class mime_parser
 				$results['SubjectEncoding'] = strtolower($message['DecodedHeaders']['subject:'][0][0]['Encoding']);
 			}
 			else
+			{
 				$results['Subject'] = $message['Headers']['subject:'];
+			}
 		}
 		if (isset($message['Headers']['date:']))
 		{
@@ -2046,9 +2107,10 @@ class mime_parser
 			{
 				$content_id = trim($message['Headers']['content-id:']);
 				$l = strlen($content_id);
-				if (!strcmp($content_id[0], '<')
-				&& !strcmp($content_id[$l - 1], '>'))
+				if (!strcmp($content_id[0], '<') && !strcmp($content_id[$l - 1], '>'))
+				{
 					$results['ContentID'] = substr($content_id, 1, $l - 2);
+				}
 			}
 		}
 		return (1);
