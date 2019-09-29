@@ -316,12 +316,12 @@ class pop3
 							{
 								return ($this->SetError("Could not retrieve the supported authentication methods"));
 							}
-							switch($this->Tokenize($response," "))
+							switch ($this->Tokenize($response," "))
 							{
 								case ".":
 								break 2;
 								case "SASL":
-									for($method=1; strlen($mechanism = $this->Tokenize(" ")); $method++)
+									for ($method=1; strlen($mechanism = $this->Tokenize(" ")); $method++)
 									{
 										$mechanisms[] = $mechanism;
 									}
@@ -381,13 +381,13 @@ class pop3
 						default:
 							return ($this->SetError("Authentication error: ".$this->Tokenize("\r\n")));
 					}
-					for (;!$authenticated;)
+					for (; !$authenticated;)
 					{
 						do
 						{
 							$status=$sasl->Step($response, $message, $interactions);
 						}
-						while($status == SASL_INTERACT);
+						while ($status == SASL_INTERACT);
 						switch ($status)
 						{
 							case SASL_CONTINUE:
@@ -400,7 +400,7 @@ class pop3
 								{
 									return ("Could not get authentication step message response");
 								}
-								switch($this->Tokenize($response," "))
+								switch ($this->Tokenize($response," "))
 								{
 									case "+OK":
 										$authenticated=1;
@@ -434,7 +434,7 @@ class pop3
 					return ($this->SetError("User error: ".$this->Tokenize("\r\n")));
 				}
 				if ($this->PutLine("PASS $password")==0)
-				[
+				{
 					return ($this->SetError("Could not send the PASS command"));
 				}
 				$response=$this->GetLine();
@@ -515,7 +515,7 @@ class pop3
 		}
 		if ($message=="")
 		{
-			for($messages=array();;)
+			for ($messages=array();;)
 			{
 				$response=$this->GetLine();
 				if (gettype($response)!="string")
@@ -588,7 +588,7 @@ class pop3
 			{
 				return ($this->SetError("Could not retrieve the message"));
 			}
-			switch($response)
+			switch ($response)
 			{
 				case ".":
 					return ("");

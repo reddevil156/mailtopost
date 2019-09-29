@@ -722,7 +722,7 @@ class mime_parser
 							case 'q':
 								if ($end>$start)
 								{
-									for ($decoded = '', $position = $start; $position < $end ;)
+									for ($decoded = '', $position = $start; $position < $end;)
 									{
 										switch ($value[$position])
 										{
@@ -937,7 +937,7 @@ class mime_parser
 										$position = $next;
 								}
 							case MIME_PARSER_BODY_DATA:
-								for ($position = $this->body_buffer_position; ;)
+								for ($position = $this->body_buffer_position;;)
 								{
 									if (!$this->FindBodyLineBreak($position, $break, $line_break))
 									{
@@ -1580,7 +1580,7 @@ class mime_parser
 			$path = $message[$prefix.'File'];
 			if (!($file = @fopen($path, 'rb')))
 				return ($this->SetPHPError('could not open the message body file '.$path, $php_errormsg));
-			for ($body = '', $end = 0;!$end;)
+			for ($body = '', $end = 0; !$end;)
 			{
 				if (!($data = @fread($file, $this->message_buffer_length)))
 				{
@@ -1636,7 +1636,9 @@ class mime_parser
 				for ($p = 0; $p < $lp; ++$p)
 				{
 					if (!$this->Analyze($message['Parts'][$p], $parts[$p]))
+					{
 						return (0);
+					}
 				}
 				switch ($sub_type)
 				{
@@ -1836,7 +1838,6 @@ class mime_parser
 						break;
 				}
 				break;
-				
 			case 'message':
 				$tolerate_unrecognized = 0;
 				switch ($sub_type)
@@ -1851,7 +1852,7 @@ class mime_parser
 							$position = 0;
 							$this->ParseHeaderString($body, $position, $headers);
 							$recipients = array();
-							for (;$position<$l;)
+							for (; $position<$l;)
 							{
 								$this->ParseHeaderString($body, $position, $headers);
 								if (count($headers))
@@ -1902,12 +1903,12 @@ class mime_parser
 			}
 		}
 		if (isset($parameters['charset']))
+		{
 			$results['Encoding'] = strtolower($parameters['charset']);
+		}
 		if (isset($message['Headers']['subject:']))
 		{
-			if (isset($message['DecodedHeaders']['subject:'])
-			&& count($message['DecodedHeaders']['subject:']) == 1
-			&& count($message['DecodedHeaders']['subject:'][0]) == 1)
+			if (isset($message['DecodedHeaders']['subject:']) && count($message['DecodedHeaders']['subject:']) == 1 && count($message['DecodedHeaders']['subject:'][0]) == 1)
 			{
 				$results['Subject'] = $message['DecodedHeaders']['subject:'][0][0]['Value'];
 				$results['SubjectEncoding'] = strtolower($message['DecodedHeaders']['subject:'][0][0]['Encoding']);
@@ -1917,28 +1918,42 @@ class mime_parser
 		}
 		if (isset($message['Headers']['date:']))
 		{
-			if (isset($message['DecodedHeaders']['date:'])
-			&& count($message['DecodedHeaders']['date:']) == 1
-			&& count($message['DecodedHeaders']['date:'][0]) == 1)
+			if (isset($message['DecodedHeaders']['date:']) && count($message['DecodedHeaders']['date:']) == 1 && count($message['DecodedHeaders']['date:'][0]) == 1)
+			{
 				$results['Date'] = $message['DecodedHeaders']['date:'][0][0]['Value'];
+			}
 			else
+			{
 				$results['Date'] = $message['Headers']['date:'];
+			}
 		}
 		$l = count($this->address_headers);
 		for (Reset($this->address_headers), $h = 0; $h<$l; Next($this->address_headers), ++$h)
+		{
 			$this->CopyAddresses($message, $results, Key($this->address_headers));
+		}
 		if ($copy_body)
 		{
 			if (isset($message['Body']))
+			{
 				$results['Data'] = $message['Body'];
+			}
 			else if (isset($message['BodyFile']))
+			{
 				$results['DataFile'] = $message['BodyFile'];
+			}
 			else if (isset($message['BodyLength']))
+			{
 				$results['DataLength'] = $message['BodyLength'];
+			}
 			if (isset($message['FileName']))
+			{
 				$results['FileName'] = $message['FileName'];
+			}
 			if (isset($message['FileDisposition']))
+			{
 				$results['FileDisposition'] = $message['FileDisposition'];
+			}
 			if (isset($message['Headers']['content-id:']))
 			{
 				$content_id = trim($message['Headers']['content-id:']);
@@ -1954,21 +1969,31 @@ class mime_parser
 	function GetPositionLine($position, &$line, &$column)
 	{
 		if (!$this->track_lines)
+		{
 			return ($this->SetPositionedError('line positions are not being tracked', $position));
+		}
 		$bottom = 0;
 		$top = count($this->lines) - 1;
 		if ($position < 0)
+		{
 			return ($this->SetPositionedError('it was not specified a valid position', $position));
+		}
 		for (;;)
 		{
 			$line = intval(($bottom + $top) / 2);
 			$current = $this->lines[$line];
 			if ($current < $position)
+			{
 				$bottom = $line + 1;
+			}
 			else if ($current > $position)
+			{
 				$top = $line - 1;
+			}
 			else
+			{}
 				break;
+			}
 			if ($top < $bottom)
 			{
 				$line = $top;
