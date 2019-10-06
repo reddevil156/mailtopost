@@ -100,8 +100,12 @@ class listener implements EventSubscriberInterface
 	*/
 	public function modify_notification($event)
 	{
-		$events	= $this->mailtopost->modify_notifications($event);
-		$event 	= $events;
+		// We only want to run this for a Mail to Post topic
+		if ($this->config['mtp_lock'])
+		{
+			$events	= $this->mailtopost->modify_notifications($event);
+			$event	= $events;
+		}
 	}
 
 	/**

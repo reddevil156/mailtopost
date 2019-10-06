@@ -75,17 +75,17 @@ class mailtopost
 	protected $mailtopost_table;
 
 	/** Variables used in this class */
-	protected $user_email;
-	protected $mail_subject;
-	protected $user_id;
-	protected $mail_address;
-	protected $user_mtp_forum;
 	protected $username;
 	protected $log_message;
+	protected $mail_address;
+	protected $mail_date;
+	protected $mail_subject;
 	protected $topic_id;
 	protected $type;
 	protected $user_colour;
-	protected $mail_date;
+	protected $user_email;
+	protected $user_id;
+	protected $user_mtp_forum;
 
 	/** The post_data data array */
 	private $post_data = array(
@@ -211,6 +211,7 @@ class mailtopost
 								$this->user_mtp_forum = $this->topic_id = $this->mail_date = 0;
 								$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
 								$mode = 'post';
+								$this->config->set('mtp_lock', true, true);
 
 								$message_file	= 'mtp://' . $connection_name . '/' . $message;
 								$parameters 	= array(
@@ -466,6 +467,7 @@ class mailtopost
 							$this->mtp_log('NO_DATA');
 						}
 					}
+					$this->config->set('mtp_lock', false, true);
 					$this->pop3->Close();
 					$this->pop3->CloseConnection();
 				}
@@ -535,14 +537,11 @@ class mailtopost
 	{
 		$notification_data = $event['notification_data'];
 
-		// Let's make sure that we are changing the correct topic
-		if ($notification_data['topic_id'] == $this->topic_id)
-		{
-			$notification_data['poster_id'] 	= $this->user_id;
-			$notification_data['topic_title']	= $this->mail_subject;
-			$event['notification_data'] 		= $notification_data;
+		$notification_data['forum_name'] 	= $this->functions->get_forum_name($this->user_mtp_forum, false);
+		$notification_data['poster_id'] 	= $this->user_id;
+		$notification_data['topic_title']	= $this->mail_subject;
+		$event['notification_data'] 		= $notification_data;
 
-			return $event;
-		}
+		return $event;
 	}
 }

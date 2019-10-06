@@ -501,7 +501,9 @@ class mime_parser
 								break;
 							}
 							else
+							{
 								$add = strlen($break);
+							}
 							$next = $line_break;
 						}
 						else if (($indent = strspn($this->buffer, '>', $next)) > 0)
@@ -588,7 +590,9 @@ class mime_parser
 							$this->state = MIME_PARSER_END;
 						}
 						else
+						{
 							$need_more_data = 1;
+						}
 					}
 				}
 				break;
@@ -925,7 +929,9 @@ class mime_parser
 						$this->body_offset = $part['Position'];
 					}
 					else
+					{
 						$this->body_buffer .= $part['Data'];
+					}
 					if (isset($this->headers['Multipart']))
 					{
 						$boundary = '--'.$this->headers['Boundary'];
@@ -962,7 +968,9 @@ class mime_parser
 										break;
 									}
 									else
+									{
 										$position = $next;
+									}
 								}
 							case MIME_PARSER_BODY_DATA:
 								for ($position = $this->body_buffer_position;;)
