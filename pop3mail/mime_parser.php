@@ -669,7 +669,7 @@ class mime_parser
 
 	function TrimEncodedWord($not_encoded)
 	{
-		if(strspn($not_encoded, " \t") == strlen($not_encoded))
+		if (strspn($not_encoded, " \t") == strlen($not_encoded))
 		{
 			$not_encoded = '';
 		}
@@ -1623,7 +1623,7 @@ class mime_parser
 						for ($v = 0; $v<$tv; ++$v)
 						{
 							$address = trim($values[$v]);
-							if(strlen($address) === 0)
+							if (strlen($address) === 0)
 							{
 								if (!$this->SetPositionedWarning('Address extraction warning from header '.$header.' empty email address', $p[$v]))
 								{
@@ -1874,7 +1874,7 @@ class mime_parser
 										}
 									}
 								break;
-								
+
 								default:
 									$this->SetErrorWithContact('the report type is '.$parameters['report-type'].' is not yet supported');
 									$results['Response'] = $this->error;
@@ -1884,7 +1884,9 @@ class mime_parser
 							$results['Type'] = $parameters['report-type'];
 						}
 						else
+						{
 							return($this->SetError('this '.$content_type.' message is not well formed because it does not define the report type'));
+						}
 						break;
 
 					case 'signed':

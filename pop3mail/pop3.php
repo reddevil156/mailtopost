@@ -252,7 +252,7 @@ class pop3
 // ***************************
 		$pop3_class = new \david63\mailtopost\pop3mail\pop3($this->config);
 		//$pop3_class = new pop3_class();
-// ***************************		
+// ***************************
 		$pop3_class->SetConnection(-1, $this->connection_name, $this);
 		return ("");
 	}
