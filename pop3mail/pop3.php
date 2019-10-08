@@ -381,7 +381,7 @@ class pop3
 						default:
 							return ($this->SetError("Authentication error: ".$this->Tokenize("\r\n")));
 					}
-					for (; !$authenticated;)
+					while (!$authenticated)
 					{
 						do
 						{
@@ -846,4 +846,4 @@ class pop3
 		$connection_name = $this->connection_name;
 		return ('');
 	}
-};
+}

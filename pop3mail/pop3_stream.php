@@ -202,4 +202,4 @@ class pop3_stream
 			$this->opened = 0;
 		}
 	}
-};
+}

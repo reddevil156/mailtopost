@@ -277,7 +277,7 @@ class rfc822_addresses
 			return (1);
 		}
 		++$c;
-		for (; $c < $l;)
+		while ($c < $l)
 		{
 			if (!$this->SkipWhiteSpace($c))
 			{
@@ -337,7 +337,7 @@ class rfc822_addresses
 	{
 		$v = $this->v;
 		$l = strlen($v);
-		for (; $p < $l;)
+		while ($p < $l)
 		{
 			switch ($w = $v[$p])
 			{
@@ -839,7 +839,7 @@ class rfc822_addresses
 			return (1);
 		}
 		$addresses = array($address);
-		for (; $g < $l;)
+		while ($g < $l)
 		{
 			if (strcmp($v[$g], ','))
 			{

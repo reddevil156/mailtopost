@@ -299,7 +299,7 @@ class mime_parser
 	{
 		$l = strlen($body);
 		$headers = array();
-		for (; $position < $l;)
+		while($position < $l)
 		{
 			if ($this->FindStringLineBreak($body, $position, $break, $line_break))
 			{
@@ -1850,7 +1850,7 @@ class mime_parser
 											$results = $parts[$p];
 											unset($results['Data']);
 										}
-										else if(!strcmp($parts[$p]['Type'], 'message'))
+										else if (!strcmp($parts[$p]['Type'], 'message'))
 										{
 											$body_part = $p;
 										}
@@ -2066,7 +2066,7 @@ class mime_parser
 							$position = 0;
 							$this->ParseHeaderString($body, $position, $headers);
 							$recipients = array();
-							for (; $position<$l;)
+							while ($position < $l)
 							{
 								$this->ParseHeaderString($body, $position, $headers);
 								if (count($headers))
