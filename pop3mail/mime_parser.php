@@ -299,7 +299,7 @@ class mime_parser
 	{
 		$l = strlen($body);
 		$headers = array();
-		while($position < $l)
+		while ($position < $l)
 		{
 			if ($this->FindStringLineBreak($body, $position, $break, $line_break))
 			{
