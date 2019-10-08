@@ -7,7 +7,7 @@
 *
 * rfc822_addresses.php
 *
-* @(#) $Id: rfc822_addresses.php,v 1.14 2011/03/25 04:57:38 mlemos Exp $
+* @(#) $Id: rfc822_addresses.php,v 1.16 2016/07/23 01:50:22 mlemos Exp $
 *
 **/
 
@@ -393,7 +393,7 @@ class rfc822_addresses
 		{
 			return (0);
 		}
-		$match = '/^([-'.($dot ? '.' : '').'A-Za-z0-9!#$&\'*+\\/=?^_{|}~]+)/';
+		$match = '/^([-'.($dot ? '.' : '').'A-Za-z0-9!#$%&\'*+\\/=?^_`{|}~]+)/';
 		for ($s = $a; $a < $l;)
 		{
 			if (preg_match($match, substr($this->v, $a), $m))
@@ -486,7 +486,7 @@ class rfc822_addresses
 		return (1);
 	}
 
-	function ParseWord(&$p, &$word)
+	function ParseWord(&$p, &$word, &$escape)
 	{
 		$word = null;
 		if (!$this->ParseQuotedString($p, $word))
@@ -497,27 +497,60 @@ class rfc822_addresses
 		{
 			return (1);
 		}
-		if (!$this->ParseAtom($p, $word, 0))
+		for ($w = '';;)
 		{
-			return (0);
+			$last = $w;
+			if (!$this->ParseAtom($p, $atom, 0))
+			{
+				return (0);
+			}
+
+			if (isset($atom))
+			{
+				$w .= $atom;
+			}
+			if ($this->ignore_syntax_errors)
+			{
+				$e = $p;
+				if (!$this->ParseQuotedPair($p, $quoted_pair))
+				{
+					return(0);
+				}
+				if (isset($quoted_pair))
+				{
+					$w .= $quoted_pair;
+					if (!isset($escape))
+					{
+						$escape = $e;
+					}
+				}
+			}
+			if ($last === $w)
+			{
+				break;
+			}
+		}
+		if (strlen($w))
+		{
+			$word = $w;
 		}
 		return (1);
 	}
 
-	function ParseObsPhrase(&$p, &$obs_phrase)
+	function ParseObsPhrase(&$p, &$obs_phrase, &$escape)
 	{
 		$obs_phrase = null;
 		$v = $this->v;
 		$l = strlen($v);
 		$ph = $p;
-		if (!$this->ParseWord($ph, $word))
+		if (!$this->ParseWord($ph, $word, $escape))
 		{
 			return (0);
 		}
 		$string = $word;
 		for (;;)
 		{
-			if (!$this->ParseWord($ph, $word))
+			if (!$this->ParseWord($ph, $word, $escape))
 			{
 				return (0);
 			}
@@ -548,10 +581,10 @@ class rfc822_addresses
 		return (1);
 	}
 
-	function ParsePhrase(&$p, &$phrase)
+	function ParsePhrase(&$p, &$phrase, $escape)
 	{
 		$phrase = null;
-		if (!$this->ParseObsPhrase($p, $phrase))
+		if (!$this->ParseObsPhrase($p, $phrase, $escape))
 		{
 			return (0);
 		}
@@ -560,14 +593,14 @@ class rfc822_addresses
 			return (1);
 		}
 		$ph = $p;
-		if (!$this->ParseWord($ph, $word))
+		if (!$this->ParseWord($ph, $word, $escape))
 		{
 			return (0);
 		}
 		$string = $word;
 		for (;;)
 		{
-			if (!$this->ParseWord($ph, $word))
+			if (!$this->ParseWord($ph, $word, $escape))
 			{
 				return (0);
 			}
@@ -653,7 +686,7 @@ class rfc822_addresses
 
 	function ParseName(&$p, &$address)
 	{
-		$address = null;
+		$address = $escape = null;
 		$a = $p;
 		if (!$this->ParsePhrase($a, $display_name))
 		{
@@ -661,6 +694,10 @@ class rfc822_addresses
 		}
 		if (isset($display_name))
 		{
+			if (isset($escape) && !$this->SetPositionedWarning('it was used an escape character outside a quoted value', $escape))
+			{
+				return(0);
+			}
 			if (!$this->QDecode($p, $display_name, $encoding))
 			{
 				return (0);
@@ -677,9 +714,9 @@ class rfc822_addresses
 
 	function ParseNameAddr(&$p, &$address)
 	{
-		$address = null;
+		$address = $escape = null;
 		$a = $p;
-		if (!$this->ParsePhrase($a, $display_name))
+		if (!$this->ParsePhrase($a, $display_name, $escape))
 		{
 			return (0);
 		}
@@ -694,6 +731,10 @@ class rfc822_addresses
 		$address = array('address'=>$addr);
 		if (isset($display_name))
 		{
+			if (isset($escape) && !$this->SetPositionedWarning('it was used an escape character outside a quoted value', $escape))
+			{
+				return(0);
+			}
 			if (!$this->QDecode($p, $display_name, $encoding))
 			{
 				return (0);
@@ -822,11 +863,11 @@ class rfc822_addresses
 
 	function ParseGroup(&$p, &$address)
 	{
-		$address = null;
+		$address = $escape = null;
 		$v = $this->v;
 		$l = strlen($v);
 		$g = $p;
-		if (!$this->ParsePhrase($g, $display_name))
+		if (!$this->ParsePhrase($g, $display_name, $escape))
 		{
 			return (0);
 		}
@@ -855,6 +896,10 @@ class rfc822_addresses
 		if ($this->SkipCommentWhiteSpace($g) && $g > $c && !$this->SetPositionedWarning('it were used invalid comments after a group of addresses', $c))
 		{
 			return (0);
+		}
+		if (isset($escape) && !$this->SetPositionedWarning('it was used an escape character outside a quoted value', $escape))
+		{
+			return(0);
 		}
 		if (!$this->QDecode($p, $display_name, $encoding))
 		{

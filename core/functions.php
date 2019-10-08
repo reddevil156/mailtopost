@@ -153,4 +153,21 @@ class functions
 
 		return $forum_name;
 	}
+
+	/**
+	* Get the text into a useable format
+	*
+	* @return $text
+	* @access public
+	*/
+	public function reformat_text($text)
+	{
+		$unique_id = uniqid();
+		$text = utf8_encode($text);
+		$text = str_ireplace(PHP_EOL . PHP_EOL, $unique_id, $text);
+		$text = str_ireplace(PHP_EOL, ' ', $text);
+		$text = str_ireplace($unique_id, PHP_EOL . PHP_EOL, $text);
+
+		return $text;
+	}
 }

@@ -55,6 +55,9 @@ class mailtopost
 	/** @var \david63\mailtopost\pop3mail\pop3 */
 	protected $pop3;
 
+	/** @var \david63\mailtopost\pop3mail\pop3_stream */
+	protected $pop3_stream;
+
 	/** @var \david63\mailtopost\pop3mail\mime_parser */
 	protected $mime_parser;
 
@@ -127,20 +130,20 @@ class mailtopost
 	/**
 	* Constructor for mailtopost process class
 	*
-	* @param \phpbb\config\config						$config					Config object
-	* @param \phpbb\auth\auth 							$auth					Auth object
-	* @param \phpbb\request\request						$request				Request object
-	* @param \phpbb\user								$user					User object
-	* @param \phpbb\language\language					$language				Language object
-	* @param \phpbb\log\log								$log					Log object
-	* @param \phpbb_db_driver							$db						The db connection
-	* @param \david63\mailtopost\core\functions			$functions				Functions for the extension
-	* @param array										$tables					phpBB db tables
-	* @param string										$smailtopost_log_table  Name of the table used to store mailtopost log data
-	* @param \david63\mailtopost\pop3mail\pop3			$pop3					Mail pop3 class
-	* @param \david63\mailtopost\pop3mail\mime_parser	$mime_parser			Mail mime parser class
-	* @param string 									$phpbb_root_path		phpBB root path
-	* @param string 									$php_ext				php ext
+	* @param \phpbb\config\config							$config					Config object
+	* @param \phpbb\auth\auth 								$auth					Auth object
+	* @param \phpbb\request\request							$request				Request object
+	* @param \phpbb\user									$user					User object
+	* @param \phpbb\language\language						$language				Language object
+	* @param \phpbb\log\log									$log					Log object
+	* @param \phpbb_db_driver								$db						The db connection
+	* @param \david63\mailtopost\core\functions				$functions				Functions for the extension
+	* @param array											$tables					phpBB db tables
+	* @param string											$smailtopost_log_table  Name of the table used to store mailtopost log data
+	* @param \david63\mailtopost\pop3mail\pop3				$pop3					Mail pop3 class
+	* @param \david63\mailtopost\pop3mail\mime_parser		$mime_parser			Mail mime parser class
+	* @param string 										$phpbb_root_path		phpBB root path
+	* @param string 										$php_ext				php ext
 	*
 	* @access public
 	*/
@@ -343,13 +346,15 @@ class mailtopost
 														$this->db->sql_freeresult($result);
 													}
 
+													// Need to do a bit of reformatting before using $mail_body
+													$mail_body = $this->functions->reformat_text($mail_body);
+
+													// Load the message parser
 													if (!class_exists('parse_message'))
 													{
 														include("{$this->phpbb_root_path}includes/message_parser.$this->phpEx");
 													}
 
-													// Load the message parser
-													$mail_body = utf8_encode($mail_body);
 													$mail_parser = new \parse_message($mail_body);
 
 													// Parse the post
@@ -489,15 +494,14 @@ class mailtopost
 				// Confirm this to the user and provide link back to previous page
 				trigger_error($mailtopost_message . adm_back_link($this->u_action));
 			}
+			else if ($this->config['mtp_debug'])
+			{
+				// The file has been output so stop
+				exit_handler();
+			}
 			else
 			{
 				return;
-			}
-
-			// The file has been output so stop
-			if ($this->config['mtp_debug'])
-			{
-				exit_handler();
 			}
 		}
 	}

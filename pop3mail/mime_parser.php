@@ -7,7 +7,7 @@
 *
 * mime_parser.php
 *
-* @(#) $Id: mime_parser.php,v 1.85 2012/08/23 12:19:59 mlemos Exp $
+* @(#) $Id: mime_parser.php,v 1.91 2016/08/27 22:11:07 mlemos Exp $
 *
 **/
 
@@ -667,6 +667,15 @@ class mime_parser
 		return (1);
 	}
 
+	function TrimEncodedWord($not_encoded)
+	{
+		if(strspn($not_encoded, " \t") == strlen($not_encoded))
+		{
+			$not_encoded = '';
+		}
+		return $not_encoded;
+	}
+
 	function DecodePart($part)
 	{
 		switch ($part['Type'])
@@ -687,19 +696,20 @@ class mime_parser
 					$error = '';
 					for ($decoded_header = array(), $position = 0; $position<strlen($value);)
 					{
-						if (gettype($encoded=strpos($value,'=?', $position))!='integer')
+						if (gettype($encoded = strpos($value,'=?', $position))!='integer')
 						{
-							if ($position<strlen($value))
+							if ($position < strlen($value))
 							{
+								$not_encoded = $this->TrimEncodedWord(substr($value, $position));
 								if (count($decoded_header))
 								{
-									$decoded_header[count($decoded_header)-1]['Value'].=substr($value, $position);
+									$decoded_header[count($decoded_header) -1]['Value'] .= $not_encoded;
 								}
 								else
 								{
 									$decoded_header[]=array(
-										'Value'=>substr($value, $position),
-										'Encoding'=>'ASCII'
+										'Value' => $not_encoded,
+										'Encoding' => 'ASCII'
 									);
 								}
 							}
@@ -729,15 +739,16 @@ class mime_parser
 						}
 						if ($encoded > $position)
 						{
+							$not_encoded = $this->TrimEncodedWord(substr($value, $position, $encoded - $position));
 							if (count($decoded_header))
 							{
-								$decoded_header[count($decoded_header)-1]['Value'].=substr($value, $position, $encoded - $position);
+								 $decoded_header[count($decoded_header) -1]['Value'] .= $not_encoded;
 							}
 							else
 							{
 								$decoded_header[]=array(
-									'Value'=>substr($value, $position, $encoded - $position),
-									'Encoding'=>'ASCII'
+									'Value' => $not_encoded,
+									'Encoding' => 'ASCII'
 								);
 							}
 						}
@@ -1590,8 +1601,8 @@ class mime_parser
 		$this->ResetParserState();
 // ***************************
 		$addresses = new \david63\mailtopost\pop3mail\rfc822_addresses();
-// ***************************
 		//$addresses = new rfc822_addresses_class;
+// ***************************
 		$addresses->ignore_syntax_errors = $this->ignore_syntax_errors;
 		for ($message = 0; ($success = $this->DecodeStream($parameters, 0, $end_of_message, $decoded_message)) && !$end_of_message; $message++)
 		{
@@ -1611,7 +1622,15 @@ class mime_parser
 						$tv = count($values);
 						for ($v = 0; $v<$tv; ++$v)
 						{
-							if ($addresses->ParseAddressList($values[$v], $a))
+							$address = trim($values[$v]);
+							if(strlen($address) === 0)
+							{
+								if (!$this->SetPositionedWarning('Address extraction warning from header '.$header.' empty email address', $p[$v]))
+								{
+									return(0);
+								}
+							}
+							else if ($addresses->ParseAddressList($address, $a))
 							{
 								if ($v==0)
 								{
@@ -1820,10 +1839,52 @@ class mime_parser
 									{
 										$results['Response'] = $body;
 									}
+								break;
+
+								case 'feedback-report':
+									$body_part = $results = null;
+									for ($p = 1; $p < $lp; ++$p)
+									{
+										if (!strcmp($parts[$p]['Type'], $parameters['report-type']))
+										{
+											$results = $parts[$p];
+											unset($results['Data']);
+										}
+										else if(!strcmp($parts[$p]['Type'], 'message'))
+										{
+											$body_part = $p;
+										}
+									}
+									if (!isset($results))
+									{
+										$this->SetErrorWithContact('the report of type '.$parameters['report-type'].' does not contain the report details part');
+										$results['Response'] = $this->error;
+										$this->error = '';
+										break;
+									}
+									if (isset($body_part))
+									{
+										if (!$this->ReadMessageBody($parts[$body_part], $body, 'Data'))
+										{
+											return false;
+										}
+										if (strlen($body))
+										{
+											$results['Response'] = $body;
+										}
+									}
+								break;
+								
+								default:
+									$this->SetErrorWithContact('the report type is '.$parameters['report-type'].' is not yet supported');
+									$results['Response'] = $this->error;
+									$this->error = '';
 									break;
 							}
+							$results['Type'] = $parameters['report-type'];
 						}
-						$results['Type'] = $parameters['report-type'];
+						else
+							return($this->SetError('this '.$content_type.' message is not well formed because it does not define the report type'));
 						break;
 
 					case 'signed':

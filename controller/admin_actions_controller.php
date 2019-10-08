@@ -117,6 +117,7 @@ class admin_actions_controller implements admin_actions_interface
 		$this->pop3->debug = $this->pop3->html_debug = 0;
 
 		$mailtopost_message = '';
+		$messages = 0;
 
 		// Is the Cron unlock form being submitted?
 		if ($this->request->is_set_post('cron_unlock'))
