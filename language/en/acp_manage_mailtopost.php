@@ -58,7 +58,7 @@ $lang = array_merge($lang, array(
 	'MTP_DATE_POST'					=> 'Post date',
 	'MTP_DAYS'						=> 'Days',
 	'MTP_DEBUG'						=> 'Debug mode',
-	'MTP_DEBUG_EXPLAIN'				=> 'Run in debug mode.<br><strong>This should only be done when there is a problem and will only be effective when being run manually.</strong>',
+	'MTP_DEBUG_EXPLAIN'				=> 'Run in debug mode.<br><strong>This should only be set when there is a problem and only in a test envionment - it should NEVER be used on a live board will only be effective when being run manually.</strong>',
 	'MTP_DEFAULT_FORUM'				=> 'Default forum',
 	'MTP_DEFAULT_FORUM_EXPLAIN'		=> 'The default forum that will be used if a user has not selected a forum for their posts to be made to.',
 	'MTP_HOSTNAME'					=> 'Mail host',
@@ -100,6 +100,7 @@ $lang = array_merge($lang, array(
 	'NEW_VERSION'					=> 'New Version',
 	'NEW_VERSION_EXPLAIN'			=> 'There is a newer version of this extension available.',
 	'NO_FORUM_SET'					=> 'A default forum has not been set.',
+	'NO_PERMISSIONS_SET'			=> 'No user permissions have been set for this extension.',
 
 	'POST_OPTIONS'					=> 'Post options',
 

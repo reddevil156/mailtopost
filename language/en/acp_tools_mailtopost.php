@@ -43,12 +43,14 @@ $lang = array_merge($lang, array(
 	'MAIL_TO_POST_TOOLS_EXPLAIN'	=> 'Here you will see how many, if any, messages are in the mailbox and either process those messages, delete them if necessary. You will also be shown if this process has locked the Cron task.',
 	'MESSAGES_DELETED'				=> 'Messages deleted from mailbox',
 	'MTP_CRON_LOCKED_EXPLAIN_1'		=> '<center>The Cron task running this process encountered an error at ',
-	'MTP_CRON_LOCKED_EXPLAIN_2'		=> '<br>You can clear this error by clicking the button below and then delete the message.</center>',
+	'MTP_CRON_LOCKED_EXPLAIN_2'		=> '<br>You can clear this error by clicking the button below and then delete the message.<br><br><strong>This should only be run in a test envionment and NEVER on a live board.</strong></center>',
 	'MTP_DELETE'					=> 'Delete messages',
 	'MTP_DELETE_EXPLAIN'			=> '<center>Clicking the button below will remove <strong>ALL</strong> the messages from the mailbox. Make sure you are certain that this is what you want to do as this action is not reversable.</center>',
 	'MTP_PROCESS'					=> 'Retrieve mail messages',
 	'MTP_PROCESS_EXPLAIN'			=> '<center>Clicking the button below will process <strong>ALL</strong> the messages in the mailbox and attempt to post them to the board.',
 	'MTP_UNLOCK'					=> 'Unlock the Cron process',
+
+	'NO_PERMISSIONS_SET'			=> 'No user permissions have been set for this extension.',
 
 	'MTP_MESSAGES'	=> array(
 		0	=> 'There are %1$s messages in the mailbox',

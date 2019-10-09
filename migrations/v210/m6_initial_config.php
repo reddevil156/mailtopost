@@ -43,7 +43,7 @@ class m6_initial_config extends migration
 			array('config.add', array('mtp_interval_type', 1)),
 			array('config.add', array('mtp_last_cron_task', '', 1)),
 			array('config.add', array('mtp_last_process', time())),
-			array('config.add', array('mtp_lock', 0, 1))
+			array('config.add', array('mtp_lock', 0, 1)),
 			array('config.add', array('mtp_log_days', 30)),
 			array('config.add', array('mtp_log_items_page', 25)),
 			array('config.add', array('mtp_log_prune_last_gc', time())),
@@ -54,7 +54,7 @@ class m6_initial_config extends migration
 			array('config.add', array('mtp_post_date', 0)),
 			array('config.add', array('mtp_process_frequency', 0)),
 			array('config.add', array('mtp_realm', '')),
-			array('config.add', array('mtp_tls', 0));
+			array('config.add', array('mtp_tls', 0)),
 			array('config.add', array('mtp_user', '')),
 			array('config.add', array('mtp_use_default_forum', 0)),
 			array('config.add', array('mtp_workstation', '')),

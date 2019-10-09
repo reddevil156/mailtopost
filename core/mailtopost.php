@@ -176,6 +176,11 @@ class mailtopost
 		// Is the form being submitted?
 		if ($this->request->is_set_post('submit') || $cron)
 		{
+			// Initialise variables
+			$this->user_id = $this->user->data['user_id'];
+			$this->user_mtp_forum = $this->topic_id = $this->mail_date = 0;
+			$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
+
 			// Set the variables for the type of run
 			if (!$cron)
 			{
@@ -188,17 +193,19 @@ class mailtopost
 			else
 			{
 				$this->type = 'C';
+
+				// We cannot run debug in Cron
 				$this->pop3->debug = $this->pop3->html_debug = 0;
 			}
 
-			// Initialise variables
-			$this->user_id = $this->user->data['user_id'];
-			$this->user_mtp_forum = $this->topic_id = $this->mail_date = 0;
-			$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
-
 			stream_wrapper_register('mtp', 'david63\mailtopost\pop3mail\pop3_stream');
 
-			if ($error = $this->pop3->Open() == '')
+			// We do not want to run if no permissions are set
+			if (!$this->functions->get_perms_count())
+			{
+				$this->mtp_log('NO_PERM_SET');
+			}
+			else if ($error = $this->pop3->Open() == '')
 			{
 				if ($error = $this->pop3->Login($this->config['mtp_user'], $this->config['mtp_password'], $this->config['mtp_apop']) == '')
 				{

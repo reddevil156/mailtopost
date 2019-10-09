@@ -58,6 +58,7 @@ $lang = array_merge($lang, array(
 	'NO_EMAIL'			=> 'User’s email is invalid',
 	'NO_MESSAGES'		=> 'No messages',
 	'NO_PERMISSION'		=> 'User does not have permission',
+	'NO_PERM_SET'		=> 'No permissions set',
 
 	'SUCCESS'			=> 'The mail has been successfully posted',
 ));

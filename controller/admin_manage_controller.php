@@ -126,6 +126,7 @@ class admin_manage_controller implements admin_manage_interface
 			'NAMESPACE'			=> $this->functions->get_ext_namespace('twig'),
 
 			'S_BACK'			=> $back,
+			'S_PERM_SET'		=> $this->functions->get_perms_count(),
 			'S_VERSION_CHECK'	=> $this->functions->version_check(),
 
 			'VERSION_NUMBER'	=> $this->functions->get_this_version(),

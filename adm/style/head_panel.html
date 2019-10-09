@@ -25,6 +25,13 @@
 	</div>
 {% endif %}
 
+{% if not S_PERM_SET %}
+	<div class="head-panel-error">
+		<div class="head-title">{{ lang('WARNING') }}</div>
+		<div class="head-description">{{ lang('NO_PERMISSIONS_SET') }}</div>
+	</div>
+{% endif %}
+
 {% if S_VERSION_CHECK %}
 	<div class="head-panel-version">
 		<div class="head-title">{{ lang('NEW_VERSION') }}</div>

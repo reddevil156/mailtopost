@@ -1,39 +1,41 @@
 {% include '@' ~ NAMESPACE ~ '/head_panel.html' %}
 
-<div class="head-panel-version">
-	<div class="head-title">{{ lang('INFORMATION') }}</div>
-	<div class="head-description">{{ MESSAGE_COUNT }}</div>
-</div>
+{% if S_PERM_SET %}
+	<div class="head-panel-version">
+		<div class="head-title">{{ lang('INFORMATION') }}</div>
+		<div class="head-description">{{ MESSAGE_COUNT }}</div>
+	</div>
 
-{% if S_MESSAGES and not S_CRON_LOCKED %}
-	<form id="mailtopost_process" method="post" action="{{ U_ACTION }}">
-		<fieldset>
-			<div class="head-description">{{ lang('MTP_PROCESS_EXPLAIN') }}</div>
-			<p class="submit-buttons">
-				<input class="large-button" type="submit" name="submit" value="{{ lang('MTP_PROCESS') }}" />
-			</p>
-		</fieldset>
-	</form>
+	{% if S_MESSAGES and not S_CRON_LOCKED %}
+		<form id="mailtopost_process" method="post" action="{{ U_ACTION }}">
+			<fieldset>
+				<div class="head-description">{{ lang('MTP_PROCESS_EXPLAIN') }}</div>
+				<p class="submit-buttons">
+					<input class="large-button" type="submit" name="submit" value="{{ lang('MTP_PROCESS') }}" />
+				</p>
+			</fieldset>
+		</form>
 
-	<form id="mailtopost_actions" method="post" action="{{ U_ACTION }}">
-		<fieldset>
-			<div class="head-description">{{ lang('MTP_DELETE_EXPLAIN') }}</div>
-			<p class="submit-buttons">
-				<input class="large-button" type="submit" name="actions" value="{{ lang('MTP_DELETE') }}" />
-			</p>
-		</fieldset>
-	</form>
-{% endif %}
+		<form id="mailtopost_actions" method="post" action="{{ U_ACTION }}">
+			<fieldset>
+				<div class="head-description">{{ lang('MTP_DELETE_EXPLAIN') }}</div>
+				<p class="submit-buttons">
+					<input class="large-button" type="submit" name="actions" value="{{ lang('MTP_DELETE') }}" />
+				</p>
+			</fieldset>
+		</form>
+	{% endif %}
 
-{% if S_CRON_LOCKED %}
-	<form id="mailtopost_cron_unlock" method="post" action="{{ U_ACTION }}">
-		<fieldset>
-			<div class="head-description">{{ lang('MTP_CRON_LOCKED_EXPLAIN_1') }}&nbsp;{{ CRON_TIME }}{{ lang('MTP_CRON_LOCKED_EXPLAIN_2') }}</div>
-			<p class="submit-buttons">
-				<input class="large-button" type="submit" name="cron_unlock" value="{{ lang('MTP_UNLOCK') }}" />
-			</p>
-		</fieldset>
-	</form>
+	{% if S_CRON_LOCKED %}
+		<form id="mailtopost_cron_unlock" method="post" action="{{ U_ACTION }}">
+			<fieldset>
+				<div class="head-description">{{ lang('MTP_CRON_LOCKED_EXPLAIN_1') }}&nbsp;{{ CRON_TIME }}{{ lang('MTP_CRON_LOCKED_EXPLAIN_2') }}</div>
+				<p class="submit-buttons">
+					<input class="large-button" type="submit" name="cron_unlock" value="{{ lang('MTP_UNLOCK') }}" />
+				</p>
+			</fieldset>
+		</form>
+	{% endif %}
 {% endif %}
 
 {% include 'overall_footer.html' %}

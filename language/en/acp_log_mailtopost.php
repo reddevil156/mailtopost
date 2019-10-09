@@ -37,33 +37,34 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
-	'CRON'				=> 'Cron',
+	'CRON'					=> 'Cron',
 
-	'DISPLAY_ENTRIES'	=> 'Show entries for',
+	'DISPLAY_ENTRIES'		=> 'Show entries for',
 
-	'GO'				=> 'Go',
+	'GO'					=> 'Go',
 
-	'MANUAL'			=> 'Manual',
-	'MTP_DEFAULT'		=> '&nbsp;(D)',
-	'MTP_LOG'			=> 'Mail to Post log',
-	'MTP_LOG_EXPLAIN'	=> 'This lists the actions carried out by Mail to Post.',
+	'MANUAL'				=> 'Manual',
+	'MTP_DEFAULT'			=> '&nbsp;(D)',
+	'MTP_LOG'		   		=> 'Mail to Post log',
+	'MTP_LOG_EXPLAIN'		=> 'This lists the actions carried out by Mail to Post.',
 
-	'NO_ENTRIES'		=> 'There are no log entries to display.',
+	'NO_ENTRIES'			=> 'There are no log entries to display.',
+	'NO_PERMISSIONS_SET'	=> 'No user permissions have been set for this extension.',
 
-	'POST_FORUM'		=> 'Forum',
-	'POST_SUBJECT'		=> 'Post subject',
+	'POST_FORUM'			=> 'Forum',
+	'POST_SUBJECT'			=> 'Post subject',
 
-	'SORT_BY'			=> 'Sort by',
-	'SORT_DATE'			=> 'Date',
-	'SORT_EMAIL'		=> 'Email',
-	'SORT_USERNAME'		=> 'Username',
-	'STATUS'			=> 'Status',
+	'SORT_BY'		   		=> 'Sort by',
+	'SORT_DATE'				=> 'Date',
+	'SORT_EMAIL'			=> 'Email',
+	'SORT_USERNAME'			=> 'Username',
+	'STATUS'				=> 'Status',
 
-	'TIME'				=> 'Date/Time',
-	'TYPE'				=> 'Run type',
+	'TIME'					=> 'Date/Time',
+	'TYPE'					=> 'Run type',
 
-	'USERNAME'			=> 'Username',
-	'USER_EMAIL'		=> 'User’s email',
+	'USERNAME'				=> 'Username',
+	'USER_EMAIL'			=> 'User’s email',
 
-	'VERSION'			=> 'Version',
+	'VERSION'				=> 'Version',
 ));

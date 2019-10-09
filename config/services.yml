@@ -124,6 +124,7 @@ services:
         class: david63\mailtopost\core\functions
         arguments:
             - '@config'
+            - '@auth'
             - '@language'
             - '@ext.manager'
             - '@dbal.conn'

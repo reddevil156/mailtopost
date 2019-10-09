@@ -10,6 +10,7 @@
 namespace david63\mailtopost\core;
 
 use phpbb\config\config;
+use phpbb\auth\auth;
 use phpbb\language\language;
 use phpbb\extension\manager;
 use phpbb\db\driver\driver_interface;
@@ -21,6 +22,9 @@ class functions
 {
 	/** @var \phpbb\config\config */
 	protected $config;
+
+	/** @var \phpbb\auth\auth */
+	protected $auth;
 
 	/** @var \phpbb\language\language */
 	protected $language;
@@ -44,6 +48,7 @@ class functions
 	* Constructor for functions
 	*
 	* @param \phpbb\config\config		$config						Config object
+	* @param \phpbb\auth\auth 			$auth						Auth object
 	* @param \phpbb\language\language	$language					Language object
 	* @param \phpbb\extension\manager 	$phpbb_extension_manager	Extension manager
 	* @param \phpbb_db_driver			$db							The db connection
@@ -53,9 +58,10 @@ class functions
 	*
 	* @access public
 	*/
-	public function __construct(config $config, language $language, manager $phpbb_extension_manager, driver_interface $db, $tables, $phpbb_root_path, $php_ext)
+	public function __construct(config $config, auth $auth, language $language, manager $phpbb_extension_manager, driver_interface $db, $tables, $phpbb_root_path, $php_ext)
 	{
 		$this->config			= $config;
+		$this->auth				= $auth;
 		$this->language			= $language;
 		$this->ext_manager		= $phpbb_extension_manager;
 		$this->db				= $db;
@@ -152,6 +158,26 @@ class functions
 		}
 
 		return $forum_name;
+	}
+
+	/**
+	* Check if any permissions for this extension have been set
+	*
+	* @return
+	* @access public
+	*/
+	public function get_perms_count()
+	{
+		//(count($this->auth->acl_get_list(false, 'u_mailtopost')[0]['u_mailtopost']) > 0) ? false : true,
+		$perm_set = $this->auth->acl_get_list(false, 'u_mailtopost');
+		if (empty($perm_set))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**

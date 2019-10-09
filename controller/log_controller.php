@@ -179,6 +179,8 @@ class log_controller implements log_interface
 
 			'NAMESPACE'			=> $this->functions->get_ext_namespace('twig'),
 
+			'S_PERM_SET'		=> $this->functions->get_perms_count(),
+
 			'VERSION_NUMBER'	=> $this->functions->get_this_version(),
 		));
 
