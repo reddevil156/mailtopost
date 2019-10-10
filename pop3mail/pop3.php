@@ -250,9 +250,7 @@ class pop3
 		$this->state="DISCONNECTED";
 
 // ***************************
-		$pop3_class = new \david63\mailtopost\pop3mail\pop3($this->config);
-		//$pop3_class = new pop3_class();
-// ***************************
+		$pop3_class = new pop3($this->config);
 		$pop3_class->SetConnection(-1, $this->connection_name, $this);
 		return ("");
 	}
@@ -838,9 +836,7 @@ class pop3
 		if (strlen($this->connection_name) == 0)
 		{
 // ***************************
-			$pop3_class = new \david63\mailtopost\pop3mail\pop3($this->config);
-// ***************************
-			//$pop3_class = new pop3_class();
+			$pop3_class = new pop3($this->config);
 			$pop3_class->SetConnection(1, $this->connection_name, $this);
 		}
 		$connection_name = $this->connection_name;

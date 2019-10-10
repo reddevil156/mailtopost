@@ -60,5 +60,6 @@ $lang = array_merge($lang, array(
 	'NO_PERMISSION'		=> 'User does not have permission',
 	'NO_PERM_SET'		=> 'No permissions set',
 
+	'SPOOF_EMAIL'		=> 'Supicious email address',
 	'SUCCESS'			=> 'The mail has been successfully posted',
 ));

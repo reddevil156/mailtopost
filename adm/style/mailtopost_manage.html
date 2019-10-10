@@ -87,6 +87,16 @@
 			</dd>
 		</dl>
 
+		<dl>
+			<dt><label for="mtp_mail_spoof">{{ lang('MTP_MAIL_SPOOF') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_MAIL_SPOOF_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_mail_spoof1" name="mtp_mail_spoof" value="1"{% if MTP_MAIL_SPOOF %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_mail_spoof1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_mail_spoof0" name="mtp_mail_spoof" value="0"{% if not MTP_MAIL_SPOOF %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_mail_spoof0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
 		<hr>
 
 		<dl>

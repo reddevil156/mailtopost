@@ -965,10 +965,8 @@ class mime_parser
 										);
 										$this->parts[]=$part;
 										unset($this->body_parser);
-// ***************************
-										$this->body_parser = new \david63\mailtopost\pop3mail\mime_parser($this->rfc822_addresses);
-// ***************************
-										//$this->body_parser = new mime_parser;
+
+										$this->body_parser = new mime_parser($this->rfc822_addresses);
 										$this->body_parser->decode_bodies = 1;
 										$this->body_parser->decode_headers = $this->decode_headers;
 										$this->body_parser->mbox = 0;
@@ -1050,10 +1048,8 @@ class mime_parser
 										);
 										$this->parts[] = $part;
 										unset($this->body_parser);
-// ***************************
-										$this->body_parser = new \david63\mailtopost\pop3mail\mime_parser($this->rfc822_addresses);
-// ***************************
-										//$this->body_parser = new mime_parser_class;
+
+										$this->body_parser = new mime_parser($this->rfc822_addresses);
 										$this->body_parser->decode_bodies = 1;
 										$this->body_parser->decode_headers = $this->decode_headers;
 										$this->body_parser->mbox = 0;
@@ -1599,10 +1595,8 @@ class mime_parser
 		}
 		$this->warnings = $decoded = array();
 		$this->ResetParserState();
-// ***************************
-		$addresses = new \david63\mailtopost\pop3mail\rfc822_addresses();
-		//$addresses = new rfc822_addresses_class;
-// ***************************
+
+		$addresses = new rfc822_addresses;
 		$addresses->ignore_syntax_errors = $this->ignore_syntax_errors;
 		for ($message = 0; ($success = $this->DecodeStream($parameters, 0, $end_of_message, $decoded_message)) && !$end_of_message; $message++)
 		{

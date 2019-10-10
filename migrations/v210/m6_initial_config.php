@@ -47,6 +47,7 @@ class m6_initial_config extends migration
 			array('config.add', array('mtp_log_days', 30)),
 			array('config.add', array('mtp_log_items_page', 25)),
 			array('config.add', array('mtp_log_prune_last_gc', time())),
+			array('config.add', array('mtp_mail_spoof', 1)),
 			array('config.add', array('mtp_moderate', 1)),
 			array('config.add', array('mtp_new_topic', 0)),
 			array('config.add', array('mtp_password', '')),

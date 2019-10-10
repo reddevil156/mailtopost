@@ -145,6 +145,7 @@ class admin_manage_controller implements admin_manage_interface
 			'MTP_INTERVAL_TYPE'		=> $this->get_mtp_interval_type(),
 			'MTP_LOG_DAYS'			=> isset($this->config['mtp_log_days']) ? $this->config['mtp_log_days'] : '',
 			'MTP_LOG_ITEMS_PAGE'	=> isset($this->config['mtp_log_items_page']) ? $this->config['mtp_log_items_page'] : '',
+			'MTP_MAIL_SPOOF'		=> isset($this->config['mtp_mail_spoof']) ? $this->config['mtp_mail_spoof'] : '',
 			'MTP_MODERATE'			=> isset($this->config['mtp_moderate']) ? $this->config['mtp_moderate'] : '',
 			'MTP_NEW_TOPIC'			=> isset($this->config['mtp_new_topic']) ? $this->config['mtp_new_topic'] : '',
 			'MTP_PASSWORD'			=> isset($this->config['mtp_password']) ? $this->config['mtp_password'] : '',
@@ -180,6 +181,7 @@ class admin_manage_controller implements admin_manage_interface
 		$this->config->set('mtp_interval_type', $this->request->variable('mtp_interval_type', 1));
 		$this->config->set('mtp_log_days', $this->request->variable('mtp_log_days', 30));
 		$this->config->set('mtp_log_items_page', $this->request->variable('mtp_log_items_page', 25));
+		$this->config->set('mtp_mail_spoof', $this->request->variable('mtp_mail_spoof', 1));
 		$this->config->set('mtp_moderate', $this->request->variable('mtp_moderate', 0));
 		$this->config->set('mtp_new_topic', $this->request->variable('mtp_new_topic', 0));
 		$this->config->set('mtp_password', $this->request->variable('mtp_password', ''));

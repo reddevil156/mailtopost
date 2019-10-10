@@ -101,9 +101,6 @@ class pop3_stream
 
 	function stream_open($path, $mode, $options, &$opened_path)
 	{
-// ***************************
-		global $config;
-// ***************************
 		$this->report_errors = (($options & STREAM_REPORT_ERRORS) != 0);
 		if (strcmp($mode, "r"))
 		{
@@ -112,9 +109,9 @@ class pop3_stream
 		$url=parse_url($path);
 		$host = $url['host'];
 // ***************************
-		$pop3_class = new \david63\mailtopost\pop3mail\pop3($config);
-// ***************************
-		//$pop3_class = new pop3_class();
+		global $config;
+		$pop3_class = new pop3($config);
+
 		$pop3 = &$pop3_class->SetConnection(0, $host, $this->pop3);
 		if (isset($pop3))
 		{
