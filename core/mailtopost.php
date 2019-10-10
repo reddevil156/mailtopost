@@ -259,23 +259,14 @@ class mailtopost
 										$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
 										$mail_body 			= $decoded[0]['Parts'][0]['Body'];
 										$dkim_signature		= $decoded[0]['Headers']['dkim-signature:'];
+										/**
+										$ip_address			= $decoded[0]['Headers']['received:'][1];
+										$ip = strstr($ip_address, '[');
+										$ip = substr(strstr($ip, ']', true), 1);
+										**/
 
-										// Do a basic check for mail spoofing
-										if ($this->config['mtp_mail_spoof'])
-										{
-											foreach ($dkim_signature as $sig)
-											{
-												$found = (strstr($sig, substr(strstr($this->mail_address, '@'), 1))) ? true : false;
-											}
-
-											if (!$found)
-											{
-												$this->pop3->DeleteMessage($message);
-												$mailtopost_message = $this->language->lang('SPOOF_EMAIL');
-												$this->mtp_log('SPOOF_EMAIL');
-											}
-										} // Make sure that there is some valid text in the message
-										else if (strlen($mail_body) == 7) // This value may not be correct
+										// Make sure that there is some valid text in the message
+										if (strlen($mail_body) == 7) // This value may not be correct
 										{
 											$this->pop3->DeleteMessage($message);
 											$mailtopost_message = $this->language->lang('BLANK_MESSAGE');
@@ -333,6 +324,21 @@ class mailtopost
 													$this->pop3->DeleteMessage($message);
 													$mailtopost_message = $this->language->lang('NO_PERMISSION');
 													$this->mtp_log('NO_PERMISSION');
+												}
+												// Do a basic check for mail spoofing
+												else if ($this->config['mtp_mail_spoof'])
+												{
+													foreach ($dkim_signature as $sig)
+													{
+														$found = (strstr($sig, substr(strstr($this->user_email, '@'), 1))) ? true : false;
+													}
+
+													if (!$found)
+													{
+														$this->pop3->DeleteMessage($message);
+														$mailtopost_message = $this->language->lang('SPOOF_EMAIL');
+											   			$this->mtp_log('SPOOF_EMAIL');
+													}
 												}
 												else
 												{
