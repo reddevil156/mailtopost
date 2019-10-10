@@ -259,11 +259,6 @@ class mailtopost
 										$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
 										$mail_body 			= $decoded[0]['Parts'][0]['Body'];
 										$dkim_signature		= $decoded[0]['Headers']['dkim-signature:'];
-										/**
-										$ip_address			= $decoded[0]['Headers']['received:'][1];
-										$ip = strstr($ip_address, '[');
-										$ip = substr(strstr($ip, ']', true), 1);
-										**/
 
 										// Do a basic check for mail spoofing
 										if ($this->config['mtp_mail_spoof'])
