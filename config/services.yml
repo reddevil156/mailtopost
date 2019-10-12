@@ -1,6 +1,7 @@
 imports:
     - { resource: tables.yml }
     - { resource: phpbb_tables.yml }
+    - { resource: mailtopost_constants.yml }
 
 services:
     david63.mailtopost.listener:
@@ -23,6 +24,7 @@ services:
             - '@language'
             - '@david63.mailtopost.core.functions'
             - '%tables%'
+            - '%mailtopost_constants%'
 
     david63.mailtopost.admin.manage.controller:
         class: david63\mailtopost\controller\admin_manage_controller
@@ -34,6 +36,7 @@ services:
             - '@language'
             - '@log'
             - '@david63.mailtopost.core.functions'
+            - '%mailtopost_constants%'			
 
     david63.mailtopost.admin.actions.controller:
         class: david63\mailtopost\controller\admin_actions_controller
@@ -49,6 +52,7 @@ services:
             - '@david63.mailtopost.core.functions'
             - '@david63.mailtopost.pop3mail.pop3'
             - '@david63.mailtopost.core.mailtopost'
+            - '%mailtopost_constants%'
 
     david63.mailtopost.log.controller:
         class: david63\mailtopost\controller\log_controller
@@ -64,6 +68,8 @@ services:
             - '@david63.mailtopost.core.functions'
             - '%core.root_path%'
             - '%core.php_ext%'
+            - '%tables%'
+            - '%mailtopost_constants%'
 
     david63.mailtopost.ucp.controller:
         class: david63\mailtopost\controller\ucp_controller
@@ -78,6 +84,7 @@ services:
             - '%tables%'
             - '%core.root_path%'
             - '%core.php_ext%'
+            - '%mailtopost_constants%'
 
     david63.mailtopost.cron.task.mailtopost_process:
         class: david63\mailtopost\cron\task\mailtopost_process
@@ -119,6 +126,7 @@ services:
             - '@david63.mailtopost.pop3mail.mime_parser'
             - '%core.root_path%'
             - '%core.php_ext%'
+            - '%mailtopost_constants%'
 
     david63.mailtopost.core.functions:
         class: david63\mailtopost\core\functions

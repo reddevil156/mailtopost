@@ -50,6 +50,12 @@ class log_controller implements log_interface
 	/** @var \david63\mailtopost\core\functions */
 	protected $functions;
 
+	/** @var string phpBB tables */
+	protected $tables;
+
+	/** @var string custom constants */
+	protected $mailtopost_constants;
+
 	/**
 	* The database table the mailtopost log is stored in
 	*
@@ -67,23 +73,25 @@ class log_controller implements log_interface
 	protected $u_action;
 
 	/**
-	* Constructor for admin controller
+	* Constructor for log controller
 	*
-	* @param \phpbb\config\config					$config				Config object
-	* @param \phpbb\db\driver\driver_interface		$db					The db connection
-	* @param \phpbb\request\request					$request			Request object
-	* @param \phpbb\template\template				$template			Template object
-	* @param \phpbb\pagination						$pagination			Pagination object
-	* @param \phpbb\user							$user				User object
-	* @param \phpbb\language\language				$language			Language object
-	* @param \david63\mailtopost\core\functions		$functions			Functions for the extension
-	* @param string 								$phpbb_root_path	phpBB root path
-	* @param string 								$php_ext			php ext
+	* @param \phpbb\config\config					$config					Config object
+	* @param \phpbb\db\driver\driver_interface		$db						The db connection
+	* @param \phpbb\request\request					$request				Request object
+	* @param \phpbb\template\template				$template				Template object
+	* @param \phpbb\pagination						$pagination				Pagination object
+	* @param \phpbb\user							$user					User object
+	* @param \phpbb\language\language				$language				Language object
+	* @param \david63\mailtopost\core\functions		$functions				Functions for the extension
+	* @param string 								$phpbb_root_path		phpBB root path
+	* @param string 								$php_ext				php ext
+	* @param array									$tables					phpBB db tables
+	* @param array	                            	$mailtopost_constants	Custom constants
 	*
 	* @return \david63\mailtopost\controller\log_controller
 	* @access public
 	*/
-	public function __construct(config $config, driver_interface $db, request $request, template $template, pagination $pagination, user $user, $mailtopost_table, language $language, functions $functions, $phpbb_root_path, $php_ext)
+	public function __construct(config $config, driver_interface $db, request $request, template $template, pagination $pagination, user $user, $mailtopost_table, language $language, functions $functions, $phpbb_root_path, $php_ext, $tables, $mailtopost_constants)
 	{
 		$this->config			= $config;
 		$this->db  				= $db;
@@ -96,6 +104,8 @@ class log_controller implements log_interface
 		$this->functions		= $functions;
 		$this->phpbb_root_path	= $phpbb_root_path;
 		$this->phpEx			= $php_ext;
+		$this->tables			= $tables;
+		$this->constants		= $mailtopost_constants;
 	}
 
 	/**
@@ -150,7 +160,7 @@ class log_controller implements log_interface
 		$this->pagination->generate_template_pagination($action, 'pagination', 'start', $log_count, $this->config['mtp_log_items_page'], $start);
 
 		$sql = 'SELECT l.*, u.username, u.username_clean, u.user_colour
-			FROM ' . $this->mailtopost_table . ' l, ' . USERS_TABLE . ' u
+			FROM ' . $this->mailtopost_table . ' l, ' . $this->tables['users'] . ' u
 			WHERE u.user_id = l.user_id
 			AND l.log_time >= ' . (int) $sql_where . "
 			ORDER BY $sql_sort";
@@ -159,14 +169,15 @@ class log_controller implements log_interface
 		while ($row = $this->db->sql_fetchrow($result))
 		{
 			$this->template->assign_block_vars('log', array(
-				'USER_EMAIL'	=> $row['user_email'],
-				'DATE'			=> $this->user->format_date($row['log_time']),
-				'FORUM'			=> $this->functions->get_forum_name($row['mtp_forum']),
-				'STATUS'		=> $this->language->lang_raw($row['log_status']),
-				'SUBJECT'		=> ($row['topic_id'] == 0) ? $row['log_subject'] : '<a href="' . $this->phpbb_root_path . 'viewtopic.' . $this->phpEx . '?f=' . $row['mtp_forum'] .'&amp;t=' . $row['topic_id'] . '">' . $row['log_subject'] . '</a>',
-				'TYPE'			=> ($row['type'] == 'C') ? $this->language->lang('CRON') : $this->language->lang('MANUAL'),
-				'USERNAME'		=> get_username_string('full', $row['user_id'], $row['username'], $row['user_colour']),
-				'USER_EMAIL'	=> $row['user_email'],
+				'USER_EMAIL'		=> $row['user_email'],
+				'DATE'				=> $this->user->format_date($row['log_time']),
+				'FORUM'				=> $this->functions->get_forum_name($row['mtp_forum']),
+				//'MAIL_SERVER_IP'	=> $row['mail_ip'],
+				'STATUS'			=> $this->language->lang_raw($row['log_status']),
+				'SUBJECT'	   		=> ($row['topic_id'] == 0) ? $row['log_subject'] : '<a href="' . $this->phpbb_root_path . 'viewtopic.' . $this->phpEx . '?f=' . $row['mtp_forum'] .'&amp;t=' . $row['topic_id'] . '">' . $row['log_subject'] . '</a>',
+				'TYPE'				=> ($row['type'] == $this->constants['type_cron']) ? $this->language->lang('CRON') : $this->language->lang('MANUAL'),
+				'USERNAME'			=> get_username_string('full', $row['user_id'], $row['username'], $row['user_colour']),
+				'USER_EMAIL'		=> $row['user_email'],
 			));
 		}
 
@@ -186,6 +197,7 @@ class log_controller implements log_interface
 
 		$this->template->assign_vars(array(
 			'S_LIMIT_DAYS'	=> $s_limit_days,
+			'S_SHOW_IP'		=> $this->config['mtp_show_ip'],
 			'S_SORT_DIR'	=> $s_sort_dir,
 			'S_SORT_KEY'	=> $s_sort_key,
 

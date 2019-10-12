@@ -163,6 +163,16 @@
 		</dl>
 
 		<dl>
+			<dt><label for="mtp_pin">{{ lang('MTP_PIN') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_PIN_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_pin1" name="mtp_pin" value="1"{% if MTP_PIN %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_pin1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_pin0" name="mtp_pin" value="0"{% if not MTP_PIN %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_pin0">{{ lang('NO') }}</label>
+			</dd>
+		</dl>
+
+		<dl>
 			<dt><label for="mtp_post_date">{{ lang('MTP_POST_DATE') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_POST_DATE_EXPLAIN') }}</span></dt>
 			<dd>
 				<input type="radio" id="mtp_post_date0" name="mtp_post_date" value="0"{% if not MTP_POST_DATE %} checked="checked"{% endif %} />
@@ -194,6 +204,16 @@
 			<dt><label for="mtp_log_items_page">{{ lang('MTP_LOG_ITEMS_PAGE') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_LOG_ITEMS_PAGE_EXPLAIN') }}</span></dt>
 			<dd>
 				<input class="textbox" name="mtp_log_items_page" type="number" id="mtp_log_items_page" value="{{ MTP_LOG_ITEMS_PAGE }}" min="1" max="99" />
+			</dd>
+		</dl>
+
+		<dl>
+			<dt><label for="mtp_show_ip">{{ lang('MTP_SHOW_IP') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_SHOW_IP_EXPLAIN') }}</span></dt>
+			<dd>
+				<input type="radio" id="mtp_show_ip1" name="mtp_show_ip" value="1"{% if MTP_SHOW_IP %} checked="checked"{% endif %} />
+				<label class="set" for="mtp_show_ip1">{{ lang('YES') }}</label>
+				<input type="radio" id="mtp_show_ip0" name="mtp_show_ip" value="0"{% if not MTP_SHOW_IP %} checked="checked"{% endif %} />
+				<label class="unset" for="mtp_show_ip0">{{ lang('NO') }}</label>
 			</dd>
 		</dl>
 	</fieldset>

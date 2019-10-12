@@ -65,6 +65,9 @@ class admin_actions_controller implements admin_actions_interface
 	/** @var \david63\mailtopost\core\mailtopost */
 	protected $mailtopost;
 
+	/** @var string custom constants */
+	protected $mailtopost_constants;
+
 	/** @var string Custom form action */
 	protected $u_action;
 
@@ -82,11 +85,12 @@ class admin_actions_controller implements admin_actions_interface
 	* @param \david63\mailtopost\core\functions		$functions				Functions for the extension
 	* @param \david63\mailtopost\pop3mail\pop3		$pop3					Mail pop3 class
 	* @param \david63\mailtopost\core\mailtopost	$mailtopost				Mail to Post process class
+	* @param array	                            	$mailtopost_constants	Custom constants
 	*
 	* @return \david63\mailtopost\controller\admin_process_controller
 	* @access public
 	*/
-	public function __construct(config $config, request $request, user $user, service $cache, template $template, language $language, driver_interface $db, $smailtopost_log_table, functions $functions, pop3 $pop3, mailtopost $mailtopost)
+	public function __construct(config $config, request $request, user $user, service $cache, template $template, language $language, driver_interface $db, $smailtopost_log_table, functions $functions, pop3 $pop3, mailtopost $mailtopost, $mailtopost_constants)
 	{
 		$this->config				= $config;
 		$this->request				= $request;
@@ -99,6 +103,7 @@ class admin_actions_controller implements admin_actions_interface
 		$this->functions			= $functions;
 		$this->pop3					= $pop3;
 		$this->mailtopost			= $mailtopost;
+		$this->constants			= $mailtopost_constants;
 	}
 
 	/**
@@ -134,12 +139,14 @@ class admin_actions_controller implements admin_actions_interface
 		}
 
 		// Is the delete message form being submitted?
-		if ($this->request->is_set_post('actions'))
+		if ($this->request->is_set_post('delete_all') || $this->request->is_set_post('delete'))
 		{
 			// We can now delete the messages
 			$this->pop3->Open();
 			$this->pop3->Login($this->config['mtp_user'], $this->config['mtp_password'], $this->config['mtp_apop']);
 			$this->pop3->Statistics($messages, $size);
+
+			$messages = ($this->request->is_set_post('delete')) ? 1 : $messages;
 
 			for ($message = 1; $message <= $messages; $message++)
 			{
@@ -210,7 +217,8 @@ class admin_actions_controller implements admin_actions_interface
 			'MESSAGE_COUNT'	=> $mailtopost_message,
 
 			'S_CRON_LOCKED'	=> $cron_locked,
-			'S_MESSAGES'	=> ($messages > 0) ? true : false,
+			'S_MESSAGE'		=> ($messages == 1) ? true : false,
+			'S_MESSAGES'	=> ($messages > 1) ? true : false,
 
 			'U_ACTION'		=> $this->u_action,
 		));
@@ -235,9 +243,10 @@ class admin_actions_controller implements admin_actions_interface
 			'log_status'	=> $status_message,
 			'log_subject'	=> '',
 			'log_time'		=> time(),
+			//'mail_ip'		=> $this->ip_address,
 			'mtp_forum'		=> 0,
 			'topic_id'		=> 0,
-			'type'			=> 'M',
+			'type'			=> $this->constants['type_manual'],
 			'user_email'	=> '',
 			'user_id'		=> $this->user->data['user_id'],
 		);

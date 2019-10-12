@@ -77,6 +77,9 @@ class mailtopost
 	*/
 	protected $mailtopost_table;
 
+	/** @var string custom constants */
+	protected $mailtopost_constants;
+
 	/** Variables used in this class */
 	protected $username;
 	protected $log_message;
@@ -144,10 +147,11 @@ class mailtopost
 	* @param \david63\mailtopost\pop3mail\mime_parser		$mime_parser			Mail mime parser class
 	* @param string 										$phpbb_root_path		phpBB root path
 	* @param string 										$php_ext				php ext
+	* @param array	                            			$mailtopost_constants	Custom constants
 	*
 	* @access public
 	*/
-	public function __construct(config $config, auth $auth, request $request, user $user, language $language, log $log, driver_interface $db, functions $functions, $tables, $smailtopost_log_table, pop3 $pop3, mime_parser $mime_parser, $phpbb_root_path, $php_ext)
+	public function __construct(config $config, auth $auth, request $request, user $user, language $language, log $log, driver_interface $db, functions $functions, $tables, $smailtopost_log_table, pop3 $pop3, mime_parser $mime_parser, $phpbb_root_path, $php_ext, $mailtopost_constants)
 	{
 		$this->config				= $config;
 		$this->auth					= $auth;
@@ -163,6 +167,7 @@ class mailtopost
 		$this->mime_parser			= $mime_parser;
 		$this->phpbb_root_path		= $phpbb_root_path;
 		$this->phpEx				= $php_ext;
+		$this->constants			= $mailtopost_constants;
 	}
 
 	/**
@@ -177,14 +182,15 @@ class mailtopost
 		if ($this->request->is_set_post('submit') || $cron)
 		{
 			// Initialise variables
-			$this->user_id = $this->user->data['user_id'];
-			$this->user_mtp_forum = $this->topic_id = $this->mail_date = 0;
+			$this->user_id 			= $this->user->data['user_id'];
+			$this->ip_address 		= $this->user->ip;
+			$this->user_mtp_forum	= $this->topic_id = $this->mail_date = 0;
 			$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
 
 			// Set the variables for the type of run
 			if (!$cron)
 			{
-				$this->type = 'M';
+				$this->type = $this->constants['type_manual'];
 				$this->pop3->debug = $this->pop3->html_debug = $this->config['mtp_debug'];
 
 				// Add the language files
@@ -192,7 +198,7 @@ class mailtopost
 			}
 			else
 			{
-				$this->type = 'C';
+				$this->type = $this->constants['type_cron'];
 
 				// We cannot run debug in Cron
 				$this->pop3->debug = $this->pop3->html_debug = 0;
@@ -219,7 +225,7 @@ class mailtopost
 							{
 								// Reset the variables
 								$this->user_mtp_forum = $this->topic_id = $this->mail_date = 0;
-								$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
+								$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = $this->ip_address = '';
 								$mode = 'post';
 								$this->config->set('mtp_lock', true, true);
 
@@ -259,14 +265,11 @@ class mailtopost
 										$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
 										$mail_body 			= $decoded[0]['Parts'][0]['Body'];
 										$dkim_signature		= $decoded[0]['Headers']['dkim-signature:'];
-										/**
-										$ip_address			= $decoded[0]['Headers']['received:'][1];
-										$ip = strstr($ip_address, '[');
-										$ip = substr(strstr($ip, ']', true), 1);
-										**/
+										$this->ip_address	= $decoded[0]['Headers']['received:'][1];
+										$this->ip_address	= substr(strstr(strstr($ip_address, '['), ']', true), 1);
 
 										// Make sure that there is some valid text in the message
-										if (strlen($mail_body) == 7) // This value may not be correct
+										if (strlen($mail_body) == $this->constants['empty_mail'])
 										{
 											$this->pop3->DeleteMessage($message);
 											$mailtopost_message = $this->language->lang('BLANK_MESSAGE');
@@ -275,7 +278,7 @@ class mailtopost
 										else
 										{
 											// Get the user's data
-											$sql = 'SELECT user_id, username, user_email, user_colour, user_mtp_forum
+											$sql = 'SELECT user_id, username, user_email, user_colour, user_mtp_forum, user_mtp_pin
 												FROM ' . $this->tables['users'] . '
 												WHERE ' . $this->db->sql_lower_text('user_email') . ' = "' . $this->mail_address . '"';
 
@@ -303,6 +306,12 @@ class mailtopost
 												$this->username 	= $row['username'];
 												$this->user_email 	= $row['user_email'];
 												$this->user_colour	= $row['user_colour'];
+												$user_pin			= $row['user_mtp_pin'];
+
+												if ($user_pin === $this->constants['default_user_pin'])
+												{
+													$this->mtp_log('DEFAULT_PIN');
+												}
 
 												if ($this->config['mtp_use_default_forum'])
 												{
@@ -315,36 +324,54 @@ class mailtopost
 
 												$this->db->sql_freeresult($result);
 
-												// Does the user posting the email have permission?
+												// Gather some variables for validation
 												$user_auth	= new \phpbb\auth\auth();
 												$userdata 	= $user_auth->obtain_user_data($this->user_id);
 												$user_auth->acl($userdata);
-												if (!$user_auth->acl_get('u_mailtopost'))
+												$mail_pin	= substr($mail_body, 0, 6);
+												$found 		= false;
+
+												if (is_array($dkim_signature))
+												{
+													foreach ($dkim_signature as $sig)
+													{
+												   		$found = (strstr($sig, substr(strstr($this->user_email, '@'), 1))) ? true : false;
+													}
+												}
+
+												// We need to remove the PIN from the message (even if we are not checking the PIN)
+												if ($mail_pin === $user_pin)
+												{
+													$mail_body = ltrim(substr($mail_body, 6));
+												}
+
+												// Let's check the PIN
+												if ($this->config['mtp_pin'] && ($mail_pin !== $user_pin))
+												{
+													$this->pop3->DeleteMessage($message);
+													$mailtopost_message = $this->language->lang('INVALID_PIN');
+													$this->mtp_log('INVALID_PIN');
+												}
+												// Does the user posting the email have permission?
+												else if (!$user_auth->acl_get('u_mailtopost'))
 												{
 													$this->pop3->DeleteMessage($message);
 													$mailtopost_message = $this->language->lang('NO_PERMISSION');
 													$this->mtp_log('NO_PERMISSION');
 												}
 												// Do a basic check for mail spoofing
-												else if ($this->config['mtp_mail_spoof'])
+												else if ($this->config['mtp_mail_spoof'] && !$found)
 												{
-													foreach ($dkim_signature as $sig)
-													{
-														$found = (strstr($sig, substr(strstr($this->user_email, '@'), 1))) ? true : false;
-													}
-
-													if (!$found)
-													{
-														$this->pop3->DeleteMessage($message);
-														$mailtopost_message = $this->language->lang('SPOOF_EMAIL');
-											   			$this->mtp_log('SPOOF_EMAIL');
-													}
+													$this->pop3->DeleteMessage($message);
+													$mailtopost_message = $this->language->lang('SPOOF_EMAIL');
+											   		$this->mtp_log('SPOOF_EMAIL');
 												}
 												else
 												{
 													if (!$this->config['mtp_new_topic'])
 													{
 														// Is this a new topic or a reply?
+														/** Need to check exactly topic title **/
 														$sql = 'SELECT topic_id, topic_title
 															FROM ' . $this->tables['topics'] . '
 										   					WHERE topic_title = "' . $this->mail_subject . '"
@@ -547,6 +574,7 @@ class mailtopost
 			'log_status'	=> $status_message,
 			'log_subject'	=> $this->mail_subject,
 			'log_time'		=> time(),
+			//'mail_ip'		=> $this->ip_address,
 			'mtp_forum'		=> $this->user_mtp_forum,
 			'topic_id'		=> $this->topic_id,
 			'type'			=> $this->type,

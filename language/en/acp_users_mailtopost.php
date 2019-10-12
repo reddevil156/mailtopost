@@ -37,11 +37,17 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
+	'DEFAULT_MTP_PIN'		=> '<strong>This is the default - please change</strong>',
+	
 	'FORUM_SELECT'			=> 'Select forum',
 	'FORUM_SELECT_EXPLAIN'	=> 'Select the forum that the user’s emails will be posted to.',
 
+	'INVALID_PIN'			=> 'The PIN is invalid. It must contain six characters and not be the default.',
+
 	'MTP_FORUM'				=> 'Mail to Post forum',
 	'MTP_FORUM_UPDATED'		=> 'Mail to Post forum updated',
+	'MTP_PIN'				=> 'User PIN',
+	'MTP_PIN_EXPLAIN'		=> 'The PIN that the user will use in their mail message.',
 
 	'NO_FORUM_SELECTED'		=> 'No forum selected',
 ));

@@ -43,8 +43,10 @@ $lang = array_merge($lang, array(
 
 	'DECODE_ERROR'		=> 'Mail message decode error',
 	'DECODE_PROBLEM'	=> 'A problem was encountered whilst decoding the message',
+	'DEFAULT_PIN'		=> 'User has not changed PIN',
 
 	'IMAGE_ERROR'		=> 'Submitted message contains an image',
+	'INVALID_PIN'		=> 'Invalid PIN entered',
 
 	'LOGIN_ERROR'		=> 'Unable to log in to the mail server',
 

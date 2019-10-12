@@ -1,0 +1,7 @@
+parameters:
+    mailtopost_constants:
+        default_user_pin: 'Abc123'
+        form_key: 'mailtopost'
+        type_cron: 'C'
+        type_manual: 'M'
+        empty_mail: 7

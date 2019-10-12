@@ -46,24 +46,28 @@ class admin_manage_controller implements admin_manage_interface
 	/** @var \david63\mailtopost\core\functions */
 	protected $functions;
 
+	/** @var string custom constants */
+	protected $mailtopost_constants;
+
 	/** @var string Custom form action */
 	protected $u_action;
 
 	/**
 	* Constructor for admin manage controller
 	*
-	* @param \phpbb\config\config					$config			Config object
-	* @param \phpbb\request\request					$request		Request object
-	* @param \phpbb\template\template				$template		Template object
-	* @param \phpbb\user							$user			User object
-	* @param \phpbb\language\language				$language		Language object
-	* @param \phpbb\log\log							$log			Log object
-	* @param \david63\mailtopost\core\functions		$functions		Functions for the extension
+	* @param \phpbb\config\config					$config					Config object
+	* @param \phpbb\request\request					$request				Request object
+	* @param \phpbb\template\template				$template				Template object
+	* @param \phpbb\user							$user					User object
+	* @param \phpbb\language\language				$language				Language object
+	* @param \phpbb\log\log							$log					Log object
+	* @param \david63\mailtopost\core\functions		$functions				Functions for the extension
+	* @param array	                            	$mailtopost_constants	Custom constants
 	*
 	* @return \david63\mailtopost\controller\admin_manage_controller
 	* @access public
 	*/
-	public function __construct(config $config, request $request, template $template, user $user, language $language, log $log, functions $functions)
+	public function __construct(config $config, request $request, template $template, user $user, language $language, log $log, functions $functions, $mailtopost_constants)
 	{
 		$this->config		= $config;
 		$this->request		= $request;
@@ -72,6 +76,7 @@ class admin_manage_controller implements admin_manage_interface
 		$this->language		= $language;
 		$this->log			= $log;
 		$this->functions	= $functions;
+		$this->constants	= $mailtopost_constants;
 	}
 
 	/**
@@ -86,8 +91,7 @@ class admin_manage_controller implements admin_manage_interface
 		$this->language->add_lang('acp_manage_mailtopost', $this->functions->get_ext_namespace());
 
 		// Create a form key for preventing CSRF attacks
-		$form_key = 'mailtopost_manage';
-		add_form_key($form_key);
+		add_form_key($this->constants['form_key']);
 
 		$back = false;
 
@@ -95,7 +99,7 @@ class admin_manage_controller implements admin_manage_interface
 		if ($this->request->is_set_post('submit'))
 		{
 			// Is the submitted form is valid?
-			if (!check_form_key($form_key))
+			if (!check_form_key($this->constants['form_key']))
 			{
 				trigger_error($this->language->lang('FORM_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
@@ -149,9 +153,11 @@ class admin_manage_controller implements admin_manage_interface
 			'MTP_MODERATE'			=> isset($this->config['mtp_moderate']) ? $this->config['mtp_moderate'] : '',
 			'MTP_NEW_TOPIC'			=> isset($this->config['mtp_new_topic']) ? $this->config['mtp_new_topic'] : '',
 			'MTP_PASSWORD'			=> isset($this->config['mtp_password']) ? $this->config['mtp_password'] : '',
+			'MTP_PIN'				=> isset($this->config['mtp_pin']) ? $this->config['mtp_pin'] : '',
 			'MTP_PORT'				=> isset($this->config['mtp_port']) ? $this->config['mtp_port'] : '',
 			'MTP_POST_DATE'			=> isset($this->config['mtp_post_date']) ? $this->config['mtp_post_date'] : '',
 			'MTP_REALM'				=> isset($this->config['mtp_realm']) ? $this->config['mtp_realm'] : '',
+			'MTP_SHOW_IP'			=> isset($this->config['mtp_show_ip']) ? $this->config['mtp_show_ip'] : '',
 			'MTP_TLS'				=> isset($this->config['mtp_tls']) ? $this->config['mtp_tls'] : '',
 			'MTP_USER' 				=> isset($this->config['mtp_user']) ? $this->config['mtp_user'] : '',
 			'MTP_USE_DEFAULT_FORUM'	=> isset($this->config['mtp_use_default_forum']) ? $this->config['mtp_use_default_forum'] : '',
@@ -185,10 +191,12 @@ class admin_manage_controller implements admin_manage_interface
 		$this->config->set('mtp_moderate', $this->request->variable('mtp_moderate', 0));
 		$this->config->set('mtp_new_topic', $this->request->variable('mtp_new_topic', 0));
 		$this->config->set('mtp_password', $this->request->variable('mtp_password', ''));
+		$this->config->set('mtp_pin', $this->request->variable('mtp_pin', 1));
 		$this->config->set('mtp_port', $this->request->variable('mtp_port', 110));
 		$this->config->set('mtp_post_date', $this->request->variable('mtp_post_date', 0));
 		$this->config->set('mtp_process_frequency', $this->request->variable('mtp_process_frequency', 0));
 		$this->config->set('mtp_realm', $this->request->variable('mtp_realm', ''));
+		$this->config->set('mtp_show_ip', $this->request->variable('mtp_show_ip', 0));
 		$this->config->set('mtp_tls', $this->request->variable('mtp_tls', 0));
 		$this->config->set('mtp_user', $this->request->variable('mtp_user', ''));
 		$this->config->set('mtp_use_default_forum', $this->request->variable('mtp_use_default_forum', 0));

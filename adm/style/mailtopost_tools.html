@@ -6,24 +6,37 @@
 		<div class="head-description">{{ MESSAGE_COUNT }}</div>
 	</div>
 
-	{% if S_MESSAGES and not S_CRON_LOCKED %}
-		<form id="mailtopost_process" method="post" action="{{ U_ACTION }}">
-			<fieldset>
-				<div class="head-description">{{ lang('MTP_PROCESS_EXPLAIN') }}</div>
-				<p class="submit-buttons">
-					<input class="large-button" type="submit" name="submit" value="{{ lang('MTP_PROCESS') }}" />
-				</p>
-			</fieldset>
-		</form>
+	{% if not S_CRON_LOCKED %}
+		{% if S_MESSAGES or S_MESSAGE%}
+			<form id="mailtopost_process" method="post" action="{{ U_ACTION }}">
+				<fieldset>
+					<div class="head-description">{{ lang('MTP_PROCESS_EXPLAIN') }}</div>
+					<p class="submit-buttons">
+						<input class="large-button" type="submit" name="submit" value="{{ lang('MTP_PROCESS') }}" />
+					</p>
+				</fieldset>
+			</form>
 
-		<form id="mailtopost_actions" method="post" action="{{ U_ACTION }}">
-			<fieldset>
-				<div class="head-description">{{ lang('MTP_DELETE_EXPLAIN') }}</div>
-				<p class="submit-buttons">
-					<input class="large-button" type="submit" name="actions" value="{{ lang('MTP_DELETE') }}" />
-				</p>
-			</fieldset>
-		</form>
+			<form id="mailtopost_delete" method="post" action="{{ U_ACTION }}">
+				<fieldset>
+					<div class="head-description">{{ lang('MTP_DELETE_EXPLAIN') }}</div>
+					<p class="submit-buttons">
+						<input class="large-button" type="submit" name="delete" value="{{ lang('MTP_DELETE') }}" />
+					</p>
+				</fieldset>
+			</form>
+		{% endif %}
+
+		{% if S_MESSAGES %}
+			<form id="mailtopost_all_delete" method="post" action="{{ U_ACTION }}">
+				<fieldset>
+					<div class="head-description">{{ lang('MTP_DELETE_ALL_EXPLAIN') }}</div>
+					<p class="submit-buttons">
+						<input class="large-button" type="submit" name="delete_all" value="{{ lang('MTP_DELETE_ALL') }}" />
+					</p>
+				</fieldset>
+			</form>
+		{% endif %}
 	{% endif %}
 
 	{% if S_CRON_LOCKED %}

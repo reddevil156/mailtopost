@@ -7,6 +7,16 @@
 			<dt><label for="forum_select">{{ lang('FORUM_SELECT') }}{{ lang('COLON') }}</label><br><span>{{ lang('FORUM_SELECT_EXPLAIN') }}</span></dt>
 			<dd><select name="user_mtp_forum" id="user_mtp_forum"><option value="0">{{ lang('SELECT_FORUM') }}</option>{{ FORUM_SELECT }}</select></dd>
 		</dl>
+
+		<dl>
+			<dt><label for="user_mtp_pin">{{ lang('MTP_PIN') }}{{ lang('COLON') }}</label><br><span>{{ lang('MTP_PIN_EXPLAIN') }}</span></dt>
+			<dd>
+				<input class="text tiny" type="text" id="user_mtp_pin" name="user_mtp_pin" value="{{ MTP_PIN }}" maxlength="6" />
+				{% if MTP_DEFAULT_PIN %}
+					&nbsp;{{ lang('DEFAULT_MTP_PIN') }}
+				{% endif %}
+			</dd>
+		</dl>
 	</fieldset>
 
 	<fieldset class="quick">

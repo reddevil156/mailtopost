@@ -16,6 +16,9 @@
 					<div class="table-header-cell-left">{{ lang('TYPE') }}</div>
 					<div class="table-header-cell">{{ lang('TIME') }}</div>
 					<div class="table-header-cell">{{ lang('USERNAME') }}</div>
+					{% if S_SHOW_IP %}
+							<div class="table-header-cell">{{ lang('MAIL_SERVER_IP') }}</div>
+					{% endif %}
 					<div class="table-header-cell">{{ lang('USER_EMAIL') }}</div>
 					<div class="table-header-cell">{{ lang('POST_SUBJECT') }}</div>
 					<div class="table-header-cell">{{ lang('POST_FORUM') }}</div>
@@ -28,6 +31,9 @@
 						<div class="table-body-cell-narrow">{{ logs.TYPE }}</div>
 						<div class="table-body-cell-narrow">{{ logs.DATE }}</div>
 						<div class="table-body-cell-narrow">{{ logs.USERNAME }}</div>
+						{% if S_SHOW_IP %}
+							<div class="table-body-cell-narrow">{{ logs.MAIL_SERVER_IP }}</div>
+						{% endif %}
 						<div class="table-body-cell-narrow">{{ logs.USER_EMAIL }}</div>
 						<div class="table-body-cell-narrow">{{ logs.SUBJECT }}</div>
 						<div class="table-body-cell-narrow">{{ logs.FORUM }}</div>

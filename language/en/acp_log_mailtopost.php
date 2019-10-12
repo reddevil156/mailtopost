@@ -43,6 +43,7 @@ $lang = array_merge($lang, array(
 
 	'GO'					=> 'Go',
 
+	'MAIL_SERVER_IP'		=> 'Mail IP',
 	'MANUAL'				=> 'Manual',
 	'MTP_DEFAULT'			=> '&nbsp;(D)',
 	'MTP_LOG'		   		=> 'Mail to Post log',

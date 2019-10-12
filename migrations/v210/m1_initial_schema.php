@@ -39,6 +39,7 @@ class m1_initial_schema extends migration
 					'COLUMNS'	=> array(
 						'log_id'			=> array('INT:10', null, 'auto_increment'),
 						'user_id'			=> array('INT:10', 0),
+						'mail_ip'			=> array('VCHAR:40', ''),
 						'user_email'		=> array('VCHAR:100', ''),
 						'mtp_forum'			=> array('UINT', 0),
 						'log_subject'		=> array('VCHAR:255', ''),
@@ -53,7 +54,8 @@ class m1_initial_schema extends migration
 
 			'add_columns' => array(
 				$this->table_prefix . 'users' => array(
-					'user_mtp_forum' => array('UINT', 0),
+					'user_mtp_forum'	=> array('UINT', 0),
+					'user_mtp_pin'		=> array('CHAR:6', ''),
 				),
 			),
 		);
@@ -75,6 +77,7 @@ class m1_initial_schema extends migration
 			'drop_columns' => array(
 				$this->table_prefix . 'users' => array(
 					'user_mtp_forum',
+					'user_mtp_pin',
 				),
 			),
 		);
