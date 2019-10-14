@@ -243,7 +243,7 @@ class admin_actions_controller implements admin_actions_interface
 			'log_status'	=> $status_message,
 			'log_subject'	=> '',
 			'log_time'		=> time(),
-			//'mail_ip'		=> $this->ip_address,
+			'mail_ip'		=> '',
 			'mtp_forum'		=> 0,
 			'topic_id'		=> 0,
 			'type'			=> $this->constants['type_manual'],

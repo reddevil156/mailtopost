@@ -55,7 +55,7 @@ class m1_initial_schema extends migration
 			'add_columns' => array(
 				$this->table_prefix . 'users' => array(
 					'user_mtp_forum'	=> array('UINT', 0),
-					'user_mtp_pin'		=> array('CHAR:6', ''),
+					'user_mtp_pin'		=> array('CHAR:6', 'Abc123'),
 				),
 			),
 		);

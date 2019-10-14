@@ -184,397 +184,363 @@ class mailtopost
 			// Initialise variables
 			$this->user_id 			= $this->user->data['user_id'];
 			$this->ip_address 		= $this->user->ip;
-			$this->user_mtp_forum	= $this->topic_id = $this->mail_date = 0;
-			$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
+			$this->user_mtp_forum	= $this->topic_id = $this->mail_date = $message = 0;
+			$this->user_email		= $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
 
 			// Set the variables for the type of run
 			if (!$cron)
 			{
-				$this->type = $this->constants['type_manual'];
-				$this->pop3->debug = $this->pop3->html_debug = $this->config['mtp_debug'];
+				$cron 				= false;
+				$this->type 		= $this->constants['type_manual'];
+				$this->pop3->debug	= $this->pop3->html_debug = $this->config['mtp_debug'];
 
 				// Add the language files
 				$this->language->add_lang('acp_mailtopost_log', $this->functions->get_ext_namespace());
 			}
 			else
 			{
+				$cron 		= true;
 				$this->type = $this->constants['type_cron'];
 
-				// We cannot run debug in Cron
+				// We don't want to run debug in Cron mode
 				$this->pop3->debug = $this->pop3->html_debug = 0;
 			}
 
+			// We do not want to run if no permissions are set
+			if ($this->functions->get_perms_count() == false)
+			{
+				$this->error_routine($message, 'NO_PERM_SET', $cron, false);
+			}
+
+			// Does the mailbox exist?
+			if (!$this->pop3->Open() == '')
+			{
+				$this->error_routine($message, 'MAILBOX_ERROR', $cron, false);
+			}
+
+			// Can we access the mailbox?
+			if (!$this->pop3->Login($this->config['mtp_user'], $this->config['mtp_password'], $this->config['mtp_apop']) == '')
+			{
+				$this->error_routine($message, 'LOGIN_ERROR', $cron, false);
+			}
+
+			// Is there any data to process?
+			if (!$this->pop3->Statistics($messages, $size) == '')
+			{
+				$this->error_routine($message, 'NO_DATA', $cron, false);
+			}
+
+			// Let's start the processing
 			stream_wrapper_register('mtp', 'david63\mailtopost\pop3mail\pop3_stream');
 
-			// We do not want to run if no permissions are set
-			if (!$this->functions->get_perms_count())
+			if ($messages > 0)
 			{
-				$this->mtp_log('NO_PERM_SET');
-			}
-			else if ($error = $this->pop3->Open() == '')
-			{
-				if ($error = $this->pop3->Login($this->config['mtp_user'], $this->config['mtp_password'], $this->config['mtp_apop']) == '')
+				$this->pop3->GetConnectionName($connection_name);
+
+				// Set the "lock" flag
+				$this->config->set('mtp_lock', true, true);
+
+				for ($message = 1; $message <= $messages; $message++)
 				{
-					if ($error = $this->pop3->Statistics($messages, $size) == '')
+					// Reset the variables
+					$this->user_mtp_forum	= $this->topic_id = $this->mail_date = 0;
+					$this->user_email 		= $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = $this->ip_address = '';
+					$mode 					= 'post';
+
+					$message_file	= 'mtp://' . $connection_name . '/' . $message;
+					$parameters 	= array('File' => $message_file,);
+
+					$success = $this->mime_parser->Decode($parameters, $decoded);
+
+					if (!$success)
 					{
-						if ($messages > 0)
+						$this->error_routine($message, 'DECODE_ERROR', $cron, false);
+					}
+
+					// Check that there is a dkim signature
+					if (array_key_exists('dkim-signature:', $decoded[0]['Headers']))
+					{
+						$dkim_signature = $decoded[0]['Headers']['dkim-signature:'];
+					}
+					else
+					{
+						$this->error_routine($message, 'NO_EMAIL_SIGNATURE', $cron);
+					}
+
+					// Need to trap images
+					if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'image') !== false)
+					{
+						$this->error_routine($message, 'IMAGE_ERROR', $cron);
+					}
+
+					// Also trap attachments
+					if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'application') !== false)
+					{
+						$this->error_routine($message, 'ATTACHMENT_ERROR', $cron);
+					}
+
+					// Grab the data we need from the mail message
+					$mail_body 			= $decoded[0]['Parts'][0]['Body'];
+					$this->ip_address	= substr(strstr(strstr($decoded[0]['Headers']['received:'][1], '['), ']', true), 1);
+					$this->mail_address	= strtolower($decoded[0]['ExtractedAddresses']['from:'][0]['address']);
+					$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
+					$this->mail_subject	= $decoded[0]['Headers']['subject:'];
+
+					// Get the user's data
+					$sql = 'SELECT user_id, username, user_email, user_colour, user_mtp_forum, user_mtp_pin
+						FROM ' . $this->tables['users'] . '
+						WHERE ' . $this->db->sql_lower_text('user_email') . ' = "' . $this->mail_address . '"';
+
+					$result = $this->db->sql_query($sql);
+
+					// Validate the user's data
+					if ($this->db->sql_affectedrows($result) == 0)
+					{
+						$this->db->sql_freeresult($result);
+						$this->error_routine($message, 'NO_EMAIL', $cron);
+					}
+
+					if ($this->db->sql_affectedrows($result) > 1)
+					{
+						$this->db->sql_freeresult($result);
+						$this->error_routine($message, 'MULTIPLE_EMAIL', $cron);
+					}
+
+					$row = $this->db->sql_fetchrow($result);
+
+					$this->user_id		= $row['user_id'];
+					$this->username 	= $row['username'];
+					$this->user_email 	= $row['user_email'];
+					$this->user_colour	= $row['user_colour'];
+					$user_pin			= $row['user_mtp_pin'];
+
+					// Has the user changed the default PIN?
+					if ($user_pin === $this->constants['default_user_pin'])
+					{
+						$this->error_routine($message, 'DEFAULT_PIN', $cron, false, true);
+					}
+
+					// Are we using the default forum?
+					if ($this->config['mtp_use_default_forum'])
+					{
+						$this->user_mtp_forum = $this->config['mtp_default_forum'];
+					}
+					else
+					{
+						$this->user_mtp_forum = ($row['user_mtp_forum'] == 0) ? $this->config['mtp_default_forum'] : $row['user_mtp_forum'];
+					}
+
+					$this->db->sql_freeresult($result);
+
+			   		// Gather some variables for validation
+					$mail_pin	= substr($mail_body, 0, 6);
+					$user_auth	= new \phpbb\auth\auth();
+					$userdata 	= $user_auth->obtain_user_data($this->user_id);
+					$user_auth->acl($userdata);
+
+					// Does the user posting the email have permission?
+					if (!$user_auth->acl_get('u_mailtopost'))
+					{
+						$this->error_routine($message, 'NO_PERMISSION', $cron);
+					}
+
+					// Do a basic check for mail spoofing
+					$found = false;
+					if (is_array($dkim_signature))
+					{
+						foreach ($dkim_signature as $sig)
 						{
-							$this->pop3->GetConnectionName($connection_name);
-
-							for ($message = 1; $message <= $messages; $message++)
-							{
-								// Reset the variables
-								$this->user_mtp_forum = $this->topic_id = $this->mail_date = 0;
-								$this->user_email = $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = $this->ip_address = '';
-								$mode = 'post';
-								$this->config->set('mtp_lock', true, true);
-
-								$message_file	= 'mtp://' . $connection_name . '/' . $message;
-								$parameters 	= array(
-									'File' => $message_file,
-								);
-
-								$success = $this->mime_parser->Decode($parameters, $decoded);
-
-								if (!$success)
-								{
-									$mailtopost_message = $this->language->lang('DECODE_ERROR');
-									$this->mtp_log('DECODE_ERROR');
-								}
-								else
-								{
-									// Need to trap images
-									if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'image') !== false)
-									{
-										$this->pop3->DeleteMessage($message);
-										$mailtopost_message = $this->language->lang('IMAGE_ERROR');
-										$this->mtp_log('IMAGE_ERROR');
-									}
-									// Also trap attachments
-									else if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'application') !== false)
-									{
-										$this->pop3->DeleteMessage($message);
-										$mailtopost_message = $this->language->lang('ATTACHMENT_ERROR');
-										$this->mtp_log('ATTACHMENT_ERROR');
-									}
-									else
-									{
-										// Grab the data we need from the mail message
-										$this->mail_address	= strtolower($decoded[0]['ExtractedAddresses']['from:'][0]['address']);
-										$this->mail_subject	= $decoded[0]['Headers']['subject:'];
-										$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
-										$mail_body 			= $decoded[0]['Parts'][0]['Body'];
-										$dkim_signature		= $decoded[0]['Headers']['dkim-signature:'];
-										$this->ip_address	= $decoded[0]['Headers']['received:'][1];
-										$this->ip_address	= substr(strstr(strstr($ip_address, '['), ']', true), 1);
-
-										// Make sure that there is some valid text in the message
-										if (strlen($mail_body) == $this->constants['empty_mail'])
-										{
-											$this->pop3->DeleteMessage($message);
-											$mailtopost_message = $this->language->lang('BLANK_MESSAGE');
-											$this->mtp_log('BLANK_MESSAGE');
-										}
-										else
-										{
-											// Get the user's data
-											$sql = 'SELECT user_id, username, user_email, user_colour, user_mtp_forum, user_mtp_pin
-												FROM ' . $this->tables['users'] . '
-												WHERE ' . $this->db->sql_lower_text('user_email') . ' = "' . $this->mail_address . '"';
-
-											$result = $this->db->sql_query($sql);
-
-											// Validate the user's data
-											if ($this->db->sql_affectedrows($result) == 0)
-											{
-												$this->db->sql_freeresult($result);
-												$this->pop3->DeleteMessage($message);
-												$mailtopost_message = $this->language->lang('NO_EMAIL');
-												$this->mtp_log('NO_EMAIL');
-											}
-											else if ($this->db->sql_affectedrows($result) > 1)
-											{
-												$this->db->sql_freeresult($result);
-												$this->pop3->DeleteMessage($message);
-												$mailtopost_message = $this->language->lang('MULTIPLE_EMAIL');
-												$this->mtp_log('MULTIPLE_EMAIL');
-											}
-											else
-											{
-												$row 				= $this->db->sql_fetchrow($result);
-												$this->user_id		= $row['user_id'];
-												$this->username 	= $row['username'];
-												$this->user_email 	= $row['user_email'];
-												$this->user_colour	= $row['user_colour'];
-												$user_pin			= $row['user_mtp_pin'];
-
-												if ($user_pin === $this->constants['default_user_pin'])
-												{
-													$this->mtp_log('DEFAULT_PIN');
-												}
-
-												if ($this->config['mtp_use_default_forum'])
-												{
-													$this->user_mtp_forum = $this->config['mtp_default_forum'];
-												}
-												else
-												{
-													$this->user_mtp_forum = ($row['user_mtp_forum'] == 0) ? $this->config['mtp_default_forum'] : $row['user_mtp_forum'];
-												}
-
-												$this->db->sql_freeresult($result);
-
-												// Gather some variables for validation
-												$user_auth	= new \phpbb\auth\auth();
-												$userdata 	= $user_auth->obtain_user_data($this->user_id);
-												$user_auth->acl($userdata);
-												$mail_pin	= substr($mail_body, 0, 6);
-												$found 		= false;
-
-												if (is_array($dkim_signature))
-												{
-													foreach ($dkim_signature as $sig)
-													{
-												   		$found = (strstr($sig, substr(strstr($this->user_email, '@'), 1))) ? true : false;
-													}
-												}
-
-												// We need to remove the PIN from the message (even if we are not checking the PIN)
-												if ($mail_pin === $user_pin)
-												{
-													$mail_body = ltrim(substr($mail_body, 6));
-												}
-
-												// Let's check the PIN
-												if ($this->config['mtp_pin'] && ($mail_pin !== $user_pin))
-												{
-													$this->pop3->DeleteMessage($message);
-													$mailtopost_message = $this->language->lang('INVALID_PIN');
-													$this->mtp_log('INVALID_PIN');
-												}
-												// Does the user posting the email have permission?
-												else if (!$user_auth->acl_get('u_mailtopost'))
-												{
-													$this->pop3->DeleteMessage($message);
-													$mailtopost_message = $this->language->lang('NO_PERMISSION');
-													$this->mtp_log('NO_PERMISSION');
-												}
-												// Do a basic check for mail spoofing
-												else if ($this->config['mtp_mail_spoof'] && !$found)
-												{
-													$this->pop3->DeleteMessage($message);
-													$mailtopost_message = $this->language->lang('SPOOF_EMAIL');
-											   		$this->mtp_log('SPOOF_EMAIL');
-												}
-												else
-												{
-													if (!$this->config['mtp_new_topic'])
-													{
-														// Is this a new topic or a reply?
-														/** Need to check exactly topic title **/
-														$sql = 'SELECT topic_id, topic_title
-															FROM ' . $this->tables['topics'] . '
-										   					WHERE topic_title = "' . $this->mail_subject . '"
-															AND forum_id = ' . $this->user_mtp_forum;
-
-														$result = $this->db->sql_query($sql);
-
-														switch ($this->db->sql_affectedrows($result))
-														{
-															case 0:
-																$mode = 'post';
-															break;
-
-															case 1:
-																$mode = 'reply';
-															break;
-
-															default:
-																$this->pop3->DeleteMessage($message);
-																$mailtopost_message = $this->language->lang('MULTIPLE_TOPICS');
-																$this->mtp_log('MULTIPLE_TOPICS');
-															break;
-														}
-
-														$this->topic_id = $this->db->sql_fetchfield('topic_id');
-
-														$this->db->sql_freeresult($result);
-													}
-
-													// Need to do a bit of reformatting before using $mail_body
-													$mail_body = $this->functions->reformat_text($mail_body);
-
-													// Load the message parser
-													if (!class_exists('parse_message'))
-													{
-														include("{$this->phpbb_root_path}includes/message_parser.$this->phpEx");
-													}
-
-													$mail_parser = new \parse_message($mail_body);
-
-													// Parse the post
-													$mail_parser->parse($this->post_data['enable_bbcode'], $this->post_data['enable_urls'], $this->post_data['enable_smilies']);
-
-													// Set the message
-													$this->post_data['bbcode_bitfield']			= $mail_parser->bbcode_bitfield;
-													$this->post_data['bbcode_uid']				= $mail_parser->bbcode_uid;
-													$this->post_data['force_approved_state']	= $this->config['mtp_moderate'];
-													$this->post_data['forum_id'] 				= $this->user_mtp_forum;
-													$this->post_data['message']					= $mail_parser->message;
-													$this->post_data['message_md5']				= md5($mail_parser->message);
-													$this->post_data['force_visibility']		= $this->config['mtp_moderate'];
-													$this->post_data['topic_id']				= $this->topic_id;
-
-													// Now submit the post
-													if (!function_exists('submit_post'))
-													{
-														include("{$this->phpbb_root_path}includes/functions_posting.$this->phpEx");
-													}
-
-													// Only here to not break "submit_post()"
-													$poll_data = array();
-
-													$url = submit_post($mode, $this->mail_subject, $this->username, POST_NORMAL, $poll_data, $this->post_data);
-
-													// Get the topic_id from the returned $url string
-													$this->topic_id = strstr($url, "t=");
-													$this->topic_id = ($cron && $mode == 'post') ? substr($this->topic_id, 2) : substr(strstr($this->topic_id, "&", true), 2);
-
-													// And now the post_id
-													$sql = 'SELECT post_id
-														FROM ' . $this->tables['posts'] . '
-														WHERE topic_id = ' . $this->topic_id . '
-														ORDER BY post_id DESC';
-
-													$result 	= $this->db->sql_query($sql);
-													$post_id	= $this->db->sql_fetchfield('post_id');
-
-													$this->db->sql_freeresult($result);
-
-													// Now update the post details in the forums, topics and posts tables
-													$set_forum = array(
-														'forum_last_poster_id' 		=> (int) $this->user_id,
-														'forum_last_poster_name' 	=> $this->username,
-														'forum_last_poster_colour'	=> $this->user_colour,
-													);
-
-													$set_topic = array(
-														'topic_last_poster_id' 		=> (int) $this->user_id,
-														'topic_last_poster_name' 	=> $this->username,
-														'topic_last_poster_colour'	=> $this->user_colour,
-													);
-
-													$set_post = array(
-														'poster_id' => (int) $this->user_id,
-													);
-
-													if ($mode != 'reply')
-													{
-														$set_topic = array_merge($set_topic, array(
-															'topic_poster' 				=> (int) $this->user_id,
-															'topic_first_poster_name' 	=> $this->username,
-															'topic_first_poster_colour'	=> $this->user_colour,
-														));
-													}
-
-													if (!$this->config['mtp_post_date'])
-													{
-														$set_forum = array_merge($set_forum, array(
-															'forum_last_post_time' => (int) $this->mail_date,
-														));
-
-														$set_topic = array_merge($set_topic, array(
-															'topic_time' => (int) $this->mail_date,
-														));
-
-														$set_post = array_merge($set_post, array(
-															'post_time' => (int) $this->mail_date,
-														));
-													}
-
-													$sql = 'UPDATE ' . $this->tables['forums'] . '
-														SET ' . $this->db->sql_build_array('UPDATE', $set_forum) . '
-														WHERE forum_id = ' . (int) $this->user_mtp_forum;
-
-													$this->db->sql_query($sql);
-
-													$sql = 'UPDATE ' . $this->tables['topics'] . '
-														SET ' . $this->db->sql_build_array('UPDATE', $set_topic) . '
-														WHERE topic_id = ' . $this->topic_id;
-
-													$this->db->sql_query($sql);
-
-													$sql = 'UPDATE ' . $this->tables['posts'] . '
-														SET ' . $this->db->sql_build_array('UPDATE', $set_post) . '
-														WHERE post_id = ' . $post_id;
-
-													$this->db->sql_query($sql);
-
-													$mailtopost_message = $this->language->lang('SUCCESS');
-													$this->mtp_log('SUCCESS');
-
-													$this->pop3->DeleteMessage($message);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							$mailtopost_message = $this->language->lang('NO_DATA');
-							$this->mtp_log('NO_DATA');
+							$found = (strstr($sig, substr(strstr($this->user_email, '@'), 1))) ? true : false;
 						}
 					}
-					$this->config->set('mtp_lock', false, true);
-					$this->pop3->Close();
-					$this->pop3->CloseConnection();
-				}
-				else
-				{
-					$mailtopost_message = $this->language->lang('LOGIN_ERROR');
-					$this->mtp_log('LOGIN_ERROR');
-				}
-			}
-			else
-			{
-				$mailtopost_message = $this->language->lang('MAILBOX_ERROR');
-				$this->mtp_log('MAILBOX_ERROR');
-			}
 
-			if (!$cron && !$this->config['mtp_debug'])
-			{
-				// Processing has been run
-				// Confirm this to the user and provide link back to previous page
-				trigger_error($mailtopost_message . adm_back_link($this->u_action));
-			}
-			else if ($this->config['mtp_debug'])
-			{
-				// The file has been output so stop
-				exit_handler();
-			}
-			else
-			{
-				return;
+					if ($this->config['mtp_mail_spoof'] && !$found)
+					{
+						$this->error_routine($message, 'SPOOF_EMAIL', $cron);
+					}
+
+					// Let's check the PIN
+					if ($this->config['mtp_pin'] && ($mail_pin !== $user_pin))
+					{
+						$this->error_routine($message, 'INVALID_PIN', $cron);
+					}
+
+					// We need to remove the PIN from the message (even if we are not checking the PIN)
+					if ($mail_pin === $user_pin)
+					{
+						$mail_body = ltrim(substr($mail_body, 6));
+					}
+
+					// Make sure that there is some valid text in the message
+					if (strlen($mail_body) == $this->constants['empty_mail'])
+					{
+						$this->error_routine($message, 'BLANK_MESSAGE', $cron);
+					}
+
+					if (!$this->config['mtp_new_topic'])
+					{
+						// Is this a new topic or a reply?
+// Need to check exactly topic title
+						$sql = 'SELECT topic_id, topic_title
+							FROM ' . $this->tables['topics'] . '
+							WHERE topic_title = "' . $this->mail_subject . '"
+							AND forum_id = ' . $this->user_mtp_forum;
+
+						$result = $this->db->sql_query($sql);
+
+						switch ($this->db->sql_affectedrows($result))
+						{
+							// No match so = new topic
+							case 0:
+								$mode = 'post';
+							break;
+
+							// One match so = reply
+							case 1:
+								$mode = 'reply';
+							break;
+
+							// Multiple matches = we do not know what to do!
+							default:
+								$this->error_routine($message, 'MULTIPLE_TOPICS', $cron);
+							break;
+						}
+
+						$this->topic_id = $this->db->sql_fetchfield('topic_id');
+
+						$this->db->sql_freeresult($result);
+					}
+
+					// Need to do a bit of reformatting before using $mail_body
+					$mail_body = $this->functions->reformat_text($mail_body);
+
+					// Load the message parser
+					if (!class_exists('parse_message'))
+					{
+						include("{$this->phpbb_root_path}includes/message_parser.$this->phpEx");
+					}
+
+					$mail_parser = new \parse_message($mail_body);
+
+					// Parse the post
+					$mail_parser->parse($this->post_data['enable_bbcode'], $this->post_data['enable_urls'], $this->post_data['enable_smilies']);
+
+					// Set the message
+					$this->post_data['bbcode_bitfield']			= $mail_parser->bbcode_bitfield;
+					$this->post_data['bbcode_uid']				= $mail_parser->bbcode_uid;
+					$this->post_data['force_approved_state']	= $this->config['mtp_moderate'];
+					$this->post_data['forum_id'] 				= $this->user_mtp_forum;
+					$this->post_data['message']					= $mail_parser->message;
+					$this->post_data['message_md5']				= md5($mail_parser->message);
+					$this->post_data['force_visibility']		= $this->config['mtp_moderate'];
+					$this->post_data['topic_id']				= $this->topic_id;
+
+					// Now submit the post
+					if (!function_exists('submit_post'))
+					{
+						include("{$this->phpbb_root_path}includes/functions_posting.$this->phpEx");
+					}
+
+					// Only here to not break "submit_post()"
+					$poll_data = array();
+
+					$url = submit_post($mode, $this->mail_subject, $this->username, POST_NORMAL, $poll_data, $this->post_data);
+
+					// Get the topic_id from the returned $url string
+					$this->topic_id = strstr($url, "t=");
+					$this->topic_id = ($cron && $mode == 'post') ? substr($this->topic_id, 2) : substr(strstr($this->topic_id, "&", true), 2);
+
+					// And now the post_id
+					$sql = 'SELECT post_id
+						FROM ' . $this->tables['posts'] . '
+							WHERE topic_id = ' . $this->topic_id . '
+						ORDER BY post_id DESC';
+
+					$result 	= $this->db->sql_query($sql);
+					$post_id	= $this->db->sql_fetchfield('post_id');
+
+					$this->db->sql_freeresult($result);
+
+					// Now update the post details in the forums, topics and posts tables
+					$set_forum = array(
+						'forum_last_poster_id' 		=> (int) $this->user_id,
+						'forum_last_poster_name' 	=> $this->username,
+						'forum_last_poster_colour'	=> $this->user_colour,
+					);
+
+					$set_topic = array(
+						'topic_last_poster_id' 		=> (int) $this->user_id,
+						'topic_last_poster_name' 	=> $this->username,
+						'topic_last_poster_colour'	=> $this->user_colour,
+					);
+
+					$set_post = array(
+						'poster_id' => (int) $this->user_id,
+					);
+
+					if ($mode != 'reply')
+					{
+						$set_topic = array_merge($set_topic, array(
+							'topic_poster' 				=> (int) $this->user_id,
+							'topic_first_poster_name' 	=> $this->username,
+							'topic_first_poster_colour'	=> $this->user_colour,
+						));
+					}
+
+					if (!$this->config['mtp_post_date'])
+					{
+						$set_forum = array_merge($set_forum, array(
+							'forum_last_post_time' => (int) $this->mail_date,
+			   			));
+
+						$set_topic = array_merge($set_topic, array(
+							'topic_time' => (int) $this->mail_date,
+						));
+
+						$set_post = array_merge($set_post, array(
+							'post_time' => (int) $this->mail_date,
+				   		));
+					}
+
+					$sql = 'UPDATE ' . $this->tables['forums'] . '
+						SET ' . $this->db->sql_build_array('UPDATE', $set_forum) . '
+						WHERE forum_id = ' . (int) $this->user_mtp_forum;
+
+					$this->db->sql_query($sql);
+
+					$sql = 'UPDATE ' . $this->tables['topics'] . '
+						SET ' . $this->db->sql_build_array('UPDATE', $set_topic) . '
+						WHERE topic_id = ' . $this->topic_id;
+
+					$this->db->sql_query($sql);
+
+					$sql = 'UPDATE ' . $this->tables['posts'] . '
+						SET ' . $this->db->sql_build_array('UPDATE', $set_post) . '
+						WHERE post_id = ' . $post_id;
+
+					$this->db->sql_query($sql);
+
+					$this->error_routine($message, 'SUCCESS', $cron);
+				}
 			}
 		}
 	}
 
 	/**
-	* Update the Mail to Post log table
+	* Log the actions and exit
 	*
 	* @return null
 	* @access public
 	*/
-	public function mtp_log($status_message)
+	public function error_routine($message, $status_message, $cron, $delete = true,  $return = false)
 	{
+		// Update the Mail to Post log table
 		// Set the values required for the log
 		$sql_ary = array(
 			'log_status'	=> $status_message,
 			'log_subject'	=> $this->mail_subject,
 			'log_time'		=> time(),
-			//'mail_ip'		=> $this->ip_address,
+			'mail_ip'		=> $this->ip_address,
 			'mtp_forum'		=> $this->user_mtp_forum,
 			'topic_id'		=> $this->topic_id,
 			'type'			=> $this->type,
@@ -585,6 +551,38 @@ class mailtopost
 		// Insert the log data into the database
 		$sql = 'INSERT INTO ' . $this->mailtopost_log_table . ' ' . $this->db->sql_build_array('INSERT', $sql_ary);
 		$this->db->sql_query($sql);
+
+		// Clean up and close the connection
+		if ($delete)
+		{
+			$this->pop3->DeleteMessage($message);
+		}
+		$this->pop3->Close();
+		$this->pop3->CloseConnection();
+
+		// Unset the "lock" flag
+		$this->config->set('mtp_lock', false, true);
+
+		if (!$cron && !$this->config['mtp_debug'])
+		{
+			// Processing has been run
+			// Confirm this to the user and provide link back to previous page
+			trigger_error($this->language->lang($status_message). adm_back_link($this->u_action));
+		}
+		else if ($this->config['mtp_debug'])
+		{
+			// The file has been output so stop
+			exit_handler();
+		}
+		else
+		{
+			return;
+		}
+
+		if ($return)
+		{
+			return;
+		}
 	}
 
 	/**

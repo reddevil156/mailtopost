@@ -168,7 +168,6 @@ class functions
 	*/
 	public function get_perms_count()
 	{
-		//(count($this->auth->acl_get_list(false, 'u_mailtopost')[0]['u_mailtopost']) > 0) ? false : true,
 		$perm_set = $this->auth->acl_get_list(false, 'u_mailtopost');
 		if (empty($perm_set))
 		{

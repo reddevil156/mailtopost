@@ -37,31 +37,32 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
-	'ATTACHMENT_ERROR'	=> 'Submitted message contains an attachment',
+	'ATTACHMENT_ERROR'		=> 'Submitted message contains an attachment',
 
-	'BLANK_MESSAGE'		=> 'The message was blank',
+	'BLANK_MESSAGE'			=> 'The message was blank',
 
-	'DECODE_ERROR'		=> 'Mail message decode error',
-	'DECODE_PROBLEM'	=> 'A problem was encountered whilst decoding the message',
-	'DEFAULT_PIN'		=> 'User has not changed PIN',
+	'DECODE_ERROR'			=> 'Mail message decode error',
+	'DECODE_PROBLEM'		=> 'A problem was encountered whilst decoding the message',
+	'DEFAULT_PIN'			=> '<strong>User has not changed default PIN</strong>',
 
-	'IMAGE_ERROR'		=> 'Submitted message contains an image',
-	'INVALID_PIN'		=> 'Invalid PIN entered',
+	'IMAGE_ERROR'			=> 'Submitted message contains an image',
+	'INVALID_PIN'			=> '<strong>Invalid PIN entered</strong>',
 
-	'LOGIN_ERROR'		=> 'Unable to log in to the mail server',
+	'LOGIN_ERROR'			=> 'Unable to log in to the mail server',
 
-	'MAILBOX_EMPTIED'	=> 'Mail messages deleted',
-	'MAILBOX_ERROR'		=> 'Unable to access the mailbox',
-	'MTP_CRON_UNLOCKED'	=> 'Cron unlocked',
-	'MULTIPLE_EMAIL'	=> 'Multiple email addresses found',
-	'MULTIPLE_TOPICS'	=> 'There are multiple matching topics',
+	'MAILBOX_EMPTIED'		=> 'Mail messages deleted',
+	'MAILBOX_ERROR'			=> 'Unable to access the mailbox',
+	'MTP_CRON_UNLOCKED'		=> 'Cron unlocked',
+	'MULTIPLE_EMAIL'		=> 'Multiple email addresses found',
+	'MULTIPLE_TOPICS'		=> 'There are multiple matching topics',
 
-	'NO_DATA'			=> 'No messages to process',
-	'NO_EMAIL'			=> 'User’s email is invalid',
-	'NO_MESSAGES'		=> 'No messages',
-	'NO_PERMISSION'		=> 'User does not have permission',
-	'NO_PERM_SET'		=> 'No permissions set',
+	'NO_DATA'				=> 'No messages to process',
+	'NO_EMAIL'				=> '<strong>User’s email is invalid<strong>',
+	'NO_EMAIL_SIGNATURE'	=> '<strong>The email does not have a dkim signature</strong>',
+	'NO_MESSAGES'			=> 'No messages',
+	'NO_PERMISSION'			=> '<strong>User does not have permission<strong>',
+	'NO_PERM_SET'			=> 'No permissions set',
 
-	'SPOOF_EMAIL'		=> 'Supicious email address',
-	'SUCCESS'			=> 'The mail has been successfully posted',
+	'SPOOF_EMAIL'			=> '<strong>Supicious email address<strong>',
+	'SUCCESS'				=> 'The mail has been successfully posted',
 ));

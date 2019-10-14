@@ -172,7 +172,7 @@ class log_controller implements log_interface
 				'USER_EMAIL'		=> $row['user_email'],
 				'DATE'				=> $this->user->format_date($row['log_time']),
 				'FORUM'				=> $this->functions->get_forum_name($row['mtp_forum']),
-				//'MAIL_SERVER_IP'	=> $row['mail_ip'],
+				'MAIL_SERVER_IP'	=> $row['mail_ip'],
 				'STATUS'			=> $this->language->lang_raw($row['log_status']),
 				'SUBJECT'	   		=> ($row['topic_id'] == 0) ? $row['log_subject'] : '<a href="' . $this->phpbb_root_path . 'viewtopic.' . $this->phpEx . '?f=' . $row['mtp_forum'] .'&amp;t=' . $row['topic_id'] . '">' . $row['log_subject'] . '</a>',
 				'TYPE'				=> ($row['type'] == $this->constants['type_cron']) ? $this->language->lang('CRON') : $this->language->lang('MANUAL'),
