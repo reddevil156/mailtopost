@@ -2,7 +2,7 @@
 	"name": "david63/mailtopost",
 	"type": "phpbb-extension",
 	"description": "Adds a feature to receive posts via an email.",
-	"version": "2.1.0-b2",
+	"version": "2.1.0-RC1",
 	"time": "2019-09-11",
 	"keywords": [
 		"phpbb",
@@ -28,7 +28,7 @@
 	"extra": {
 		"display-name": "[*] Mail to post",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.2.7"
+			"phpbb/phpbb": ">=3.2.8"
 		},
 		"version-check": {
         	"host": "version.phpbbdev.space",

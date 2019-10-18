@@ -120,7 +120,7 @@ class pop3_stream
 		}
 		else
 		{
-			$this->pop3=new pop3_class;
+			$this->pop3=new pop3($config);
 		}
 		if (!$this->ParsePath($path, $url))
 		{

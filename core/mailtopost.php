@@ -80,55 +80,21 @@ class mailtopost
 	/** @var string custom constants */
 	protected $mailtopost_constants;
 
-	/** Variables used in this class */
+	/** Variables required for this class */
+	protected $close;
+	protected $cron;
 	protected $username;
 	protected $log_message;
 	protected $mail_address;
 	protected $mail_date;
 	protected $mail_subject;
+	protected $post_data;
 	protected $topic_id;
 	protected $type;
 	protected $user_colour;
 	protected $user_email;
 	protected $user_id;
 	protected $user_mtp_forum;
-
-	/** The post_data data array */
-	private $post_data = array(
-		'topic_id'				=> 0,
-		'forum_id'				=> 0,
-		'icon_id'				=> 0,
-		'poster_id'				=> 0,
-		'topic_first_post_id'	=> 0,
-		'topic_last_post_id'	=> 0,
-
-		// Defining Post Options
-		'enable_bbcode'		=> 1,
-		'enable_smilies'	=> 1,
-		'enable_urls'       => 1,
-		'enable_sig'        => 1,
-
-		// Message Body
-		'message'		=> '',
-		'message_md5'	=> '',
-
-		// Values from generate_text_for_storage()
-		'bbcode_bitfield'	=> '',
-		'bbcode_uid'		=> '',
-
-		// Other Options
-		'post_edit_locked'	=> false,
-		'topic_title'		=> '',
-
-		// Email Notification Settings
-		'notify_set'	=> 0,
-		'notify'		=> '',
-		'post_time'		=> 0,
-		'forum_name'	=> '',
-
-		// Indexing
-		'enable_indexing' => true,
-	);
 
 	/**
 	* Constructor for mailtopost process class
@@ -181,16 +147,18 @@ class mailtopost
 		// Is the form being submitted?
 		if ($this->request->is_set_post('submit') || $cron)
 		{
-			// Initialise variables
+			// Initialise the variables
 			$this->user_id 			= $this->user->data['user_id'];
-			$this->ip_address 		= $this->user->ip;
-			$this->user_mtp_forum	= $this->topic_id = $this->mail_date = $message = 0;
-			$this->user_email		= $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = '';
+			$this->ip_address		= $this->user->ip;
+			$this->user_mtp_forum	= $this->topic_id = 0;
+			$this->mail_subject 	= $this->mail_address = '';
+			$message 				= 0;
+			$this->close 			= true;
 
 			// Set the variables for the type of run
 			if (!$cron)
 			{
-				$cron 				= false;
+				$this->cron 		= false;
 				$this->type 		= $this->constants['type_manual'];
 				$this->pop3->debug	= $this->pop3->html_debug = $this->config['mtp_debug'];
 
@@ -199,7 +167,7 @@ class mailtopost
 			}
 			else
 			{
-				$cron 		= true;
+				$this->cron = true;
 				$this->type = $this->constants['type_cron'];
 
 				// We don't want to run debug in Cron mode
@@ -209,32 +177,31 @@ class mailtopost
 			// We do not want to run if no permissions are set
 			if ($this->functions->get_perms_count() == false)
 			{
-				$this->error_routine($message, 'NO_PERM_SET', $cron, false);
+				$this->error_routine($message, 'NO_PERM_SET', false, false);
 			}
 
 			// Does the mailbox exist?
-			if (!$this->pop3->Open() == '')
+			if ($this->pop3->Open() != '')
 			{
-				$this->error_routine($message, 'MAILBOX_ERROR', $cron, false);
+				$this->error_routine($message, 'MAILBOX_ERROR', false, false);
 			}
 
 			// Can we access the mailbox?
-			if (!$this->pop3->Login($this->config['mtp_user'], $this->config['mtp_password'], $this->config['mtp_apop']) == '')
+			if ($this->pop3->Login($this->config['mtp_user'], $this->config['mtp_password'], $this->config['mtp_apop']) != '')
 			{
-				$this->error_routine($message, 'LOGIN_ERROR', $cron, false);
+				$this->error_routine($message, 'LOGIN_ERROR', false, false);
 			}
 
 			// Is there any data to process?
-			if (!$this->pop3->Statistics($messages, $size) == '')
+			$this->pop3->Statistics($messages, $size);
+			if ($messages == 0)
 			{
-				$this->error_routine($message, 'NO_DATA', $cron, false);
+				$this->error_routine($message, 'NO_DATA', false, false);
 			}
-
-			// Let's start the processing
-			stream_wrapper_register('mtp', 'david63\mailtopost\pop3mail\pop3_stream');
-
-			if ($messages > 0)
+			else // Let's start the processing
 			{
+				stream_wrapper_register('mtp', 'david63\mailtopost\pop3mail\pop3_stream');
+
 				$this->pop3->GetConnectionName($connection_name);
 
 				// Set the "lock" flag
@@ -246,16 +213,24 @@ class mailtopost
 					$this->user_mtp_forum	= $this->topic_id = $this->mail_date = 0;
 					$this->user_email 		= $this->mail_subject = $this->mail_address = $this->username = $this->user_colour = $this->ip_address = '';
 					$mode 					= 'post';
+					$this->close			= ($message == $messages) ? true : false;
 
+					// Read the mail message file
 					$message_file	= 'mtp://' . $connection_name . '/' . $message;
 					$parameters 	= array('File' => $message_file,);
-
-					$success = $this->mime_parser->Decode($parameters, $decoded);
+					$success		= $this->mime_parser->Decode($parameters, $decoded);
 
 					if (!$success)
 					{
-						$this->error_routine($message, 'DECODE_ERROR', $cron, false);
+						$this->error_routine($message, 'DECODE_ERROR');
+						continue;
 					}
+
+					// Grab the data we need from the mail message
+					$this->ip_address	= substr(strstr(strstr($decoded[0]['Headers']['received:'][1], '['), ']', true), 1);
+					$this->mail_address	= strtolower($decoded[0]['ExtractedAddresses']['from:'][0]['address']);
+					$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
+					$this->mail_subject	= $decoded[0]['Headers']['subject:'];
 
 					// Check that there is a dkim signature
 					if (array_key_exists('dkim-signature:', $decoded[0]['Headers']))
@@ -264,27 +239,26 @@ class mailtopost
 					}
 					else
 					{
-						$this->error_routine($message, 'NO_EMAIL_SIGNATURE', $cron);
+						$this->error_routine($message, 'NO_EMAIL_SIGNATURE');
+						continue;
 					}
 
-					// Need to trap images
+					// Need to trap images as we cannot post them
 					if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'image') !== false)
 					{
-						$this->error_routine($message, 'IMAGE_ERROR', $cron);
+						$this->error_routine($message, 'IMAGE_ERROR');
+						continue;
 					}
 
-					// Also trap attachments
+					// Also trap attachments as we cannot post them
 					if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'application') !== false)
 					{
-						$this->error_routine($message, 'ATTACHMENT_ERROR', $cron);
+						$this->error_routine($message, 'ATTACHMENT_ERROR');
+						continue;
 					}
 
-					// Grab the data we need from the mail message
-					$mail_body 			= $decoded[0]['Parts'][0]['Body'];
-					$this->ip_address	= substr(strstr(strstr($decoded[0]['Headers']['received:'][1], '['), ']', true), 1);
-					$this->mail_address	= strtolower($decoded[0]['ExtractedAddresses']['from:'][0]['address']);
-					$this->mail_date	= strtotime($decoded[0]['Headers']['date:']);
-					$this->mail_subject	= $decoded[0]['Headers']['subject:'];
+					// Now we can get the mail body
+					$mail_body = $decoded[0]['Parts'][0]['Body'];
 
 					// Get the user's data
 					$sql = 'SELECT user_id, username, user_email, user_colour, user_mtp_forum, user_mtp_pin
@@ -297,13 +271,15 @@ class mailtopost
 					if ($this->db->sql_affectedrows($result) == 0)
 					{
 						$this->db->sql_freeresult($result);
-						$this->error_routine($message, 'NO_EMAIL', $cron);
+						$this->error_routine($message, 'NO_EMAIL');
+						continue;
 					}
 
 					if ($this->db->sql_affectedrows($result) > 1)
 					{
 						$this->db->sql_freeresult($result);
-						$this->error_routine($message, 'MULTIPLE_EMAIL', $cron);
+						$this->error_routine($message, 'MULTIPLE_EMAIL');
+						continue;
 					}
 
 					$row = $this->db->sql_fetchrow($result);
@@ -313,12 +289,6 @@ class mailtopost
 					$this->user_email 	= $row['user_email'];
 					$this->user_colour	= $row['user_colour'];
 					$user_pin			= $row['user_mtp_pin'];
-
-					// Has the user changed the default PIN?
-					if ($user_pin === $this->constants['default_user_pin'])
-					{
-						$this->error_routine($message, 'DEFAULT_PIN', $cron, false, true);
-					}
 
 					// Are we using the default forum?
 					if ($this->config['mtp_use_default_forum'])
@@ -341,7 +311,8 @@ class mailtopost
 					// Does the user posting the email have permission?
 					if (!$user_auth->acl_get('u_mailtopost'))
 					{
-						$this->error_routine($message, 'NO_PERMISSION', $cron);
+						$this->error_routine($message, 'NO_PERMISSION');
+						continue;
 					}
 
 					// Do a basic check for mail spoofing
@@ -356,34 +327,45 @@ class mailtopost
 
 					if ($this->config['mtp_mail_spoof'] && !$found)
 					{
-						$this->error_routine($message, 'SPOOF_EMAIL', $cron);
+						$this->error_routine($message, 'SPOOF_EMAIL');
+						continue;
 					}
 
-					// Let's check the PIN
-					if ($this->config['mtp_pin'] && ($mail_pin !== $user_pin))
+					// Has the user changed the default PIN?
+					if ($user_pin === $this->constants['default_user_pin'])
 					{
-						$this->error_routine($message, 'INVALID_PIN', $cron);
-					}
-
-					// We need to remove the PIN from the message (even if we are not checking the PIN)
-					if ($mail_pin === $user_pin)
-					{
-						$mail_body = ltrim(substr($mail_body, 6));
+						// Just report this in the log
+						$this->error_routine($message, 'DEFAULT_PIN', false);
 					}
 
 					// Make sure that there is some valid text in the message
 					if (strlen($mail_body) == $this->constants['empty_mail'])
 					{
-						$this->error_routine($message, 'BLANK_MESSAGE', $cron);
+						$this->error_routine($message, 'BLANK_MESSAGE');
+						continue;
+					}
+
+					// Let's check the PIN
+					if ($this->config['mtp_pin'] && ($mail_pin !== $user_pin))
+					{
+						$this->error_routine($message, 'INVALID_PIN');
+						continue;
+					}
+
+					// We need to remove the PIN from the message even if we
+					// are not checking the PIN as a user may have entered it!
+					if ($mail_pin === $user_pin)
+					{
+						$mail_body = ltrim(substr($mail_body, 6));
 					}
 
 					if (!$this->config['mtp_new_topic'])
 					{
 						// Is this a new topic or a reply?
-// Need to check exactly topic title
-						$sql = 'SELECT topic_id, topic_title
+						// Use BINARY to get a case sensitive match
+						$sql = 'SELECT topic_id
 							FROM ' . $this->tables['topics'] . '
-							WHERE topic_title = "' . $this->mail_subject . '"
+							WHERE BINARY topic_title = "' . $this->mail_subject . '"
 							AND forum_id = ' . $this->user_mtp_forum;
 
 						$result = $this->db->sql_query($sql);
@@ -400,9 +382,10 @@ class mailtopost
 								$mode = 'reply';
 							break;
 
-							// Multiple matches = we do not know what to do!
+							// Multiple matches = we do not know what to do,
+							// so we will create (another) new topic!
 							default:
-								$this->error_routine($message, 'MULTIPLE_TOPICS', $cron);
+								$mode = 'post';
 							break;
 						}
 
@@ -411,7 +394,7 @@ class mailtopost
 						$this->db->sql_freeresult($result);
 					}
 
-					// Need to do a bit of reformatting before using $mail_body
+					// We need to do a bit of reformatting before using $mail_body
 					$mail_body = $this->functions->reformat_text($mail_body);
 
 					// Load the message parser
@@ -420,9 +403,27 @@ class mailtopost
 						include("{$this->phpbb_root_path}includes/message_parser.$this->phpEx");
 					}
 
-					$mail_parser = new \parse_message($mail_body);
+					// The post_data data array
+					$this->post_data = array(
+						'icon_id'				=> 0,
+						'poster_id'				=> 0,
+						'topic_first_post_id'	=> 0,
+						'topic_last_post_id'	=> 0,
+						'enable_bbcode'			=> 1,
+						'enable_smilies'		=> 1,
+						'enable_urls'       	=> 1,
+						'enable_sig'        	=> 1,
+						'post_edit_locked'		=> false,
+						'topic_title'			=> '',
+						'notify_set'			=> 0,
+						'notify'				=> '',
+						'post_time'				=> 0,
+						'forum_name'			=> '',
+						'enable_indexing' 		=> true,
+					);
 
 					// Parse the post
+					$mail_parser = new \parse_message($mail_body);
 					$mail_parser->parse($this->post_data['enable_bbcode'], $this->post_data['enable_urls'], $this->post_data['enable_smilies']);
 
 					// Set the message
@@ -450,7 +451,7 @@ class mailtopost
 					$this->topic_id = strstr($url, "t=");
 					$this->topic_id = ($cron && $mode == 'post') ? substr($this->topic_id, 2) : substr(strstr($this->topic_id, "&", true), 2);
 
-					// And now the post_id
+					// And now get the post_id
 					$sql = 'SELECT post_id
 						FROM ' . $this->tables['posts'] . '
 							WHERE topic_id = ' . $this->topic_id . '
@@ -520,7 +521,8 @@ class mailtopost
 
 					$this->db->sql_query($sql);
 
-					$this->error_routine($message, 'SUCCESS', $cron);
+					$this->error_routine($message, 'SUCCESS');
+					continue;
 				}
 			}
 		}
@@ -532,7 +534,7 @@ class mailtopost
 	* @return null
 	* @access public
 	*/
-	public function error_routine($message, $status_message, $cron, $delete = true,  $return = false)
+	public function error_routine($message, $status_message, $delete = true, $return = true)
 	{
 		// Update the Mail to Post log table
 		// Set the values required for the log
@@ -557,15 +559,18 @@ class mailtopost
 		{
 			$this->pop3->DeleteMessage($message);
 		}
-		$this->pop3->Close();
-		$this->pop3->CloseConnection();
 
-		// Unset the "lock" flag
-		$this->config->set('mtp_lock', false, true);
-
-		if (!$cron && !$this->config['mtp_debug'])
+		if ($this->close)
 		{
-			// Processing has been run
+			$this->pop3->Close();
+			$this->pop3->CloseConnection();
+
+			// Unset the "lock" flag
+			$this->config->set('mtp_lock', false, true);
+		}
+
+		if (!$this->cron && !$this->config['mtp_debug'] && $this->close)
+		{
 			// Confirm this to the user and provide link back to previous page
 			trigger_error($this->language->lang($status_message). adm_back_link($this->u_action));
 		}
@@ -573,10 +578,6 @@ class mailtopost
 		{
 			// The file has been output so stop
 			exit_handler();
-		}
-		else
-		{
-			return;
 		}
 
 		if ($return)

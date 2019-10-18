@@ -1,66 +1,68 @@
 {% include '@' ~ NAMESPACE ~ '/head_panel.html' %}
 
-<form id="list" method="post" action="{{ U_ACTION }}">
-
-	{% if pagination %}
-		<div class="head-panel">
-			<div class="pagination">
-				{% include 'pagination.html' %}
-			</div>
-		</div>
-	{% endif %}
-
-	{% if log %}
-		<div class="table">
-			<div class="table-header">
-					<div class="table-header-cell-left">{{ lang('TYPE') }}</div>
-					<div class="table-header-cell">{{ lang('TIME') }}</div>
-					<div class="table-header-cell">{{ lang('USERNAME') }}</div>
-					{% if S_SHOW_IP %}
-							<div class="table-header-cell">{{ lang('MAIL_SERVER_IP') }}</div>
-					{% endif %}
-					<div class="table-header-cell">{{ lang('USER_EMAIL') }}</div>
-					<div class="table-header-cell">{{ lang('POST_SUBJECT') }}</div>
-					<div class="table-header-cell">{{ lang('POST_FORUM') }}</div>
-					<div class="table-header-cell-right">{{ lang('STATUS') }}</div>
-			</div>
-
-			<div class="table-body">
-				{% for logs in log %}
-					{% if logs.S_ROW_COUNT is even %}<div class="table-row1">{% else %}<div class="table-row2">{% endif %}
-						<div class="table-body-cell-narrow">{{ logs.TYPE }}</div>
-						<div class="table-body-cell-narrow">{{ logs.DATE }}</div>
-						<div class="table-body-cell-narrow">{{ logs.USERNAME }}</div>
-						{% if S_SHOW_IP %}
-							<div class="table-body-cell-narrow">{{ logs.MAIL_SERVER_IP }}</div>
-						{% endif %}
-						<div class="table-body-cell-narrow">{{ logs.USER_EMAIL }}</div>
-						<div class="table-body-cell-narrow">{{ logs.SUBJECT }}</div>
-						<div class="table-body-cell-narrow">{{ logs.FORUM }}</div>
-						<div class="table-body-cell-narrow">{{ logs.STATUS }}</div>
-					</div>
-				{% endfor %}
-			</div>
-		</div>
+{% if S_PERM_SET %}
+	<form id="list" method="post" action="{{ U_ACTION }}">
 
 		{% if pagination %}
-			<div class="pagination">
-				{% include 'pagination.html' %}
+			<div class="head-panel">
+				<div class="pagination">
+					{% include 'pagination.html' %}
+				</div>
 			</div>
 		{% endif %}
 
-	{% else %}
-		<div class="errorbox">
-			<p>{{ lang('NO_ENTRIES') }}</p>
-		</div>
-	{% endif %}
+		{% if log %}
+			<div class="table">
+				<div class="table-header">
+						<div class="table-header-cell-left">{{ lang('TYPE') }}</div>
+						<div class="table-header-cell">{{ lang('TIME') }}</div>
+						<div class="table-header-cell">{{ lang('USERNAME') }}</div>
+						{% if S_SHOW_IP %}
+							<div class="table-header-cell">{{ lang('MAIL_SERVER_IP') }}</div>
+						{% endif %}
+						<div class="table-header-cell">{{ lang('USER_EMAIL') }}</div>
+						<div class="table-header-cell">{{ lang('POST_SUBJECT') }}</div>
+						<div class="table-header-cell">{{ lang('POST_FORUM') }}</div>
+						<div class="table-header-cell-right">{{ lang('STATUS') }}</div>
+				</div>
 
-	<fieldset>
-		{{ lang('DISPLAY_ENTRIES') }}{{ lang('COLON') }}&nbsp;{{ S_LIMIT_DAYS }}&nbsp;{{ lang('SORT_BY') }}{{ lang('COLON') }} {{ S_SORT_KEY }} {{ S_SORT_DIR }}
-		<input class="adm-button" type="submit" id="submit" name="sort" value="{{ lang('GO') }}">
-		{{ S_FORM_TOKEN }}
-	</fieldset>
+				<div class="table-body">
+					{% for logs in log %}
+						{% if logs.S_ROW_COUNT is even %}<div class="table-row1">{% else %}<div class="table-row2">{% endif %}
+							<div class="table-body-cell-narrow">{{ logs.TYPE }}</div>
+							<div class="table-body-cell-narrow">{{ logs.DATE }}</div>
+							<div class="table-body-cell-narrow">{{ logs.USERNAME }}</div>
+							{% if S_SHOW_IP %}
+								<div class="table-body-cell-narrow">{{ logs.MAIL_SERVER_IP }}</div>
+							{% endif %}
+							<div class="table-body-cell-narrow">{{ logs.USER_EMAIL }}</div>
+							<div class="table-body-cell-narrow">{{ logs.SUBJECT }}</div>
+							<div class="table-body-cell-narrow">{{ logs.FORUM }}</div>
+							<div class="table-body-cell-narrow">{{ logs.STATUS }}</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
 
-</form>
+			{% if pagination %}
+				<div class="pagination">
+					{% include 'pagination.html' %}
+				</div>
+			{% endif %}
+
+		{% else %}
+			<div class="errorbox">
+				<p>{{ lang('NO_ENTRIES') }}</p>
+			</div>
+		{% endif %}
+
+		<fieldset>
+			{{ lang('DISPLAY_ENTRIES') }}{{ lang('COLON') }}&nbsp;{{ S_LIMIT_DAYS }}&nbsp;{{ lang('SORT_BY') }}{{ lang('COLON') }} {{ S_SORT_KEY }} {{ S_SORT_DIR }}
+			<input class="adm-button" type="submit" id="submit" name="sort" value="{{ lang('GO') }}">
+			{{ S_FORM_TOKEN }}
+		</fieldset>
+
+	</form>
+{% endif %}
 
 {% include 'overall_footer.html' %}

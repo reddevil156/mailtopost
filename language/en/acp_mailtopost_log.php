@@ -54,7 +54,6 @@ $lang = array_merge($lang, array(
 	'MAILBOX_ERROR'			=> 'Unable to access the mailbox',
 	'MTP_CRON_UNLOCKED'		=> 'Cron unlocked',
 	'MULTIPLE_EMAIL'		=> 'Multiple email addresses found',
-	'MULTIPLE_TOPICS'		=> 'There are multiple matching topics',
 
 	'NO_DATA'				=> 'No messages to process',
 	'NO_EMAIL'				=> '<strong>User’s email is invalid<strong>',
