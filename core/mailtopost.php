@@ -302,7 +302,7 @@ class mailtopost
 
 					$this->db->sql_freeresult($result);
 
-			   		// Gather some variables for validation
+					// Gather some variables for validation
 					$mail_pin	= substr($mail_body, 0, 6);
 					$user_auth	= new \phpbb\auth\auth();
 					$userdata 	= $user_auth->obtain_user_data($this->user_id);
@@ -492,7 +492,7 @@ class mailtopost
 					{
 						$set_forum = array_merge($set_forum, array(
 							'forum_last_post_time' => (int) $this->mail_date,
-			   			));
+						));
 
 						$set_topic = array_merge($set_topic, array(
 							'topic_time' => (int) $this->mail_date,
@@ -500,7 +500,7 @@ class mailtopost
 
 						$set_post = array_merge($set_post, array(
 							'post_time' => (int) $this->mail_date,
-				   		));
+						));
 					}
 
 					$sql = 'UPDATE ' . $this->tables['forums'] . '
