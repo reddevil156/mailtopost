@@ -273,7 +273,7 @@ label {
 /* ---------
 Pagination
 --------- */
-.pagination li a, .pagnation li span, li .pagination li a, li .pagnation li span, .pagination li.active span, .pagination .ellipsis span {
+.pagination li a, .pagination li span, li .pagination li a, li .pagination li span, .pagination li.active span, .pagination .ellipsis span {
 	box-shadow: 0.15em 0.2em 0 0 #899599;
 	background: linear-gradient(to bottom, #ededed 5%, #bab1ba 100%);
 	background-color: #ededed;

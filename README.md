@@ -1,6 +1,6 @@
 # Email to Post extension for phpBB
 
-Adds a feature to recieve posts via an email.
+Adds a feature to receive posts via an email.
 
 [![Build Status](https://travis-ci.com/david63/mailtopost.svg?branch=master)](https://travis-ci.com/david63/mailtopost)
 [![License](https://poser.pugx.org/david63/mailtopost/license)](https://packagist.org/packages/david63/mailtopost)

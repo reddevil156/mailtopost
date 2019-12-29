@@ -108,7 +108,7 @@ class mailtopost
 	* @param \phpbb_db_driver								$db						The db connection
 	* @param \david63\mailtopost\core\functions				$functions				Functions for the extension
 	* @param array											$tables					phpBB db tables
-	* @param string											$smailtopost_log_table  Name of the table used to store mailtopost log data
+	* @param string											$mailtopost_log_table  Name of the table used to store mailtopost log data
 	* @param \david63\mailtopost\pop3mail\pop3				$pop3					Mail pop3 class
 	* @param \david63\mailtopost\pop3mail\mime_parser		$mime_parser			Mail mime parser class
 	* @param string 										$phpbb_root_path		phpBB root path
@@ -117,7 +117,7 @@ class mailtopost
 	*
 	* @access public
 	*/
-	public function __construct(config $config, auth $auth, request $request, user $user, language $language, log $log, driver_interface $db, functions $functions, $tables, $smailtopost_log_table, pop3 $pop3, mime_parser $mime_parser, $phpbb_root_path, $php_ext, $mailtopost_constants)
+	public function __construct(config $config, auth $auth, request $request, user $user, language $language, log $log, driver_interface $db, functions $functions, $tables, $mailtopost_log_table, pop3 $pop3, mime_parser $mime_parser, $phpbb_root_path, $php_ext, $mailtopost_constants)
 	{
 		$this->config				= $config;
 		$this->auth					= $auth;
@@ -128,7 +128,7 @@ class mailtopost
 		$this->db					= $db;
 		$this->functions			= $functions;
 		$this->tables				= $tables;
-		$this->mailtopost_log_table	= $smailtopost_log_table;
+		$this->mailtopost_log_table	= $mailtopost_log_table;
 		$this->pop3					= $pop3;
 		$this->mime_parser			= $mime_parser;
 		$this->phpbb_root_path		= $phpbb_root_path;
