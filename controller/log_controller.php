@@ -91,7 +91,7 @@ class log_controller implements log_interface
 	* @return \david63\mailtopost\controller\log_controller
 	* @access public
 	*/
-	public function __construct(config $config, driver_interface $db, request $request, template $template, pagination $pagination, user $user, $mailtopost_table, language $language, functions $functions, $phpbb_root_path, $php_ext, $tables, $mailtopost_constants)
+	public function __construct(config $config, driver_interface $db, request $request, template $template, pagination $pagination, user $user, language $language, functions $functions, $phpbb_root_path, $php_ext, $tables, $mailtopost_constants)
 	{
 		$this->config			= $config;
 		$this->db  				= $db;
