@@ -47,11 +47,11 @@ services:
             - '@template'
             - '@language'
             - '@dbal.conn'
-            - '%david63.mailtopost.tables.mailtopost_log%'
             - '@david63.mailtopost.core.functions'
             - '@david63.mailtopost.pop3mail.pop3'
             - '@david63.mailtopost.core.mailtopost'
             - '%mailtopost_constants%'
+            - '%tables%'
 
     david63.mailtopost.log.controller:
         class: david63\mailtopost\controller\log_controller
@@ -62,7 +62,6 @@ services:
             - '@template'
             - '@pagination'
             - '@user'
-            - '%david63.mailtopost.tables.mailtopost_log%'
             - '@language'
             - '@david63.mailtopost.core.functions'
             - '%core.root_path%'
@@ -102,7 +101,7 @@ services:
             - '@dbal.conn'
             - '@log'
             - '@user'
-            - '%david63.mailtopost.tables.mailtopost_log%'
+            - '%tables%'
         calls:
             - [set_name, [cron.task.mailtopost_log_prune]]
         tags:
@@ -120,7 +119,6 @@ services:
             - '@dbal.conn'
             - '@david63.mailtopost.core.functions'
             - '%tables%'
-            - '%david63.mailtopost.tables.mailtopost_log%'
             - '@david63.mailtopost.pop3mail.pop3'
             - '@david63.mailtopost.pop3mail.mime_parser'
             - '%core.root_path%'

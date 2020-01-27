@@ -49,13 +49,6 @@ class admin_actions_controller implements admin_actions_interface
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
-	/**
-	* The database table the mailtopost log is stored in
-	*
-	* @var string
-	*/
-	protected $mailtopost_table;
-
 	/** @var \david63\mailtopost\core\functions */
 	protected $functions;
 
@@ -67,6 +60,9 @@ class admin_actions_controller implements admin_actions_interface
 
 	/** @var string custom constants */
 	protected $mailtopost_constants;
+
+	/** @var string phpBB tables */
+	protected $tables;
 
 	/** @var string Custom form action */
 	protected $u_action;
@@ -81,29 +77,29 @@ class admin_actions_controller implements admin_actions_interface
 	* @param \phpbb\template\template				$template				Template object
 	* @param \phpbb\language\language				$language				Language object
 	* @param \phpbb_db_driver						$db						The db connection
-	* @param string									$smailtopost_log_table  Name of the table used to store mailtopost log data
 	* @param \david63\mailtopost\core\functions		$functions				Functions for the extension
 	* @param \david63\mailtopost\pop3mail\pop3		$pop3					Mail pop3 class
 	* @param \david63\mailtopost\core\mailtopost	$mailtopost				Mail to Post process class
 	* @param array	                            	$mailtopost_constants	Custom constants
+	* @param array									$tables					phpBB db tables
 	*
 	* @return \david63\mailtopost\controller\admin_process_controller
 	* @access public
 	*/
-	public function __construct(config $config, request $request, user $user, service $cache, template $template, language $language, driver_interface $db, $smailtopost_log_table, functions $functions, pop3 $pop3, mailtopost $mailtopost, $mailtopost_constants)
+	public function __construct(config $config, request $request, user $user, service $cache, template $template, language $language, driver_interface $db, functions $functions, pop3 $pop3, mailtopost $mailtopost, $mailtopost_constants, $tables)
 	{
-		$this->config				= $config;
-		$this->request				= $request;
-		$this->user					= $user;
-		$this->cache				= $cache;
-		$this->template				= $template;
-		$this->language				= $language;
-		$this->db					= $db;
-		$this->mailtopost_log_table	= $smailtopost_log_table;
-		$this->functions			= $functions;
-		$this->pop3					= $pop3;
-		$this->mailtopost			= $mailtopost;
-		$this->constants			= $mailtopost_constants;
+		$this->config		= $config;
+		$this->request		= $request;
+		$this->user			= $user;
+		$this->cache		= $cache;
+		$this->template		= $template;
+		$this->language		= $language;
+		$this->db			= $db;
+		$this->functions	= $functions;
+		$this->pop3			= $pop3;
+		$this->mailtopost	= $mailtopost;
+		$this->constants	= $mailtopost_constants;
+		$this->tables		= $tables;
 	}
 
 	/**
@@ -257,7 +253,7 @@ class admin_actions_controller implements admin_actions_interface
 		);
 
 		// Insert the log data into the database
-		$sql = 'INSERT INTO ' . $this->mailtopost_log_table . ' ' . $this->db->sql_build_array('INSERT', $sql_ary);
+		$sql = 'INSERT INTO ' . $this->tables['mailtopost_log'] . ' ' . $this->db->sql_build_array('INSERT', $sql_ary);
 		$this->db->sql_query($sql);
 	}
 

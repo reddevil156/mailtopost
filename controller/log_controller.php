@@ -99,7 +99,6 @@ class log_controller implements log_interface
 		$this->template			= $template;
 		$this->pagination		= $pagination;
 		$this->user				= $user;
-		$this->mailtopost_table	= $mailtopost_table;
 		$this->language			= $language;
 		$this->functions		= $functions;
 		$this->phpbb_root_path	= $phpbb_root_path;
@@ -149,7 +148,7 @@ class log_controller implements log_interface
 
 		// Get total log count for pagination
 		$sql = 'SELECT COUNT(log_id) AS total_logs
-			FROM ' . $this->mailtopost_table . '
+			FROM ' . $this->tables['mailtopost_log'] . '
 				WHERE log_time >= ' . (int) $sql_where;
 		$result		= $this->db->sql_query($sql);
 
@@ -162,7 +161,7 @@ class log_controller implements log_interface
 		$this->pagination->generate_template_pagination($action, 'pagination', 'start', $log_count, $this->config['mtp_log_items_page'], $start);
 
 		$sql = 'SELECT l.*, u.username, u.username_clean, u.user_colour
-			FROM ' . $this->mailtopost_table . ' l, ' . $this->tables['users'] . ' u
+			FROM ' . $this->tables['mailtopost_log'] . ' l, ' . $this->tables['users'] . ' u
 			WHERE u.user_id = l.user_id
 			AND l.log_time >= ' . (int) $sql_where . "
 			ORDER BY $sql_sort";

@@ -31,29 +31,25 @@ class mailtopost_log_prune extends \phpbb\cron\task\base
 	/** @var \phpbb\user */
 	protected $user;
 
-	/**
-	* The database table the mailtopost log is stored in
-	*
-	* @var string
-	*/
-	protected $mailtopost_table;
+	/** @var string phpBB tables */
+	protected $tables;
 
 	/**
 	* Constructor.
 	*
-	* @param \phpbb_config		$config 				Config object
-	* @param \phpbb_db_driver	$db 					The db connection
-	* @param \phpbb\log\log		$log					Log object
-	* @param \phpbb\user		$user					User object
-	* @param string				$mailtopost_log_table 	Name of the table used to store mailtopost log data
+	* @param \phpbb_config		$config 	Config object
+	* @param \phpbb_db_driver	$db 		The db connection
+	* @param \phpbb\log\log		$log		Log object
+	* @param \phpbb\user		$user		User object
+	* @param array				$tables		phpBB db tables
 	*/
-	public function __construct(config $config, driver_interface $db, log $log, user $user, $mailtopost_log_table)
+	public function __construct(config $config, driver_interface $db, log $log, user $user, $tables)
 	{
-		$this->config				= $config;
-		$this->db					= $db;
-		$this->log					= $log;
-		$this->user					= $user;
-		$this->mailtopost_log_table	= $mailtopost_log_table;
+		$this->config	= $config;
+		$this->db		= $db;
+		$this->log		= $log;
+		$this->user		= $user;
+		$this->tables	= $tables;
 	}
 
 	/**
@@ -65,7 +61,7 @@ class mailtopost_log_prune extends \phpbb\cron\task\base
 	{
 		$last_log = time() - ($this->config['mtp_log_days'] * 86400);
 
-		$sql = 'DELETE FROM ' . $this->mailtopost_log_table . '
+		$sql = 'DELETE FROM ' . $this->tables['mailtopost_log'] . '
 			WHERE log_time < ' . (int) $last_log;
 		$this->db->sql_query($sql);
 
