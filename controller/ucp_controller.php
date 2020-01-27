@@ -136,7 +136,7 @@ class ucp_controller implements ucp_interface
 					$sql = 'UPDATE ' . $this->tables['users'] . '
 						SET user_mtp_forum = ' . $user_forum . ',
 							user_mtp_pin = "' . $user_pin . '"
-						WHERE user_id = ' . $this->user->data['user_id'];
+						WHERE user_id = ' . (int) $this->user->data['user_id'];
 
 					$this->db->sql_query($sql);
 
@@ -151,7 +151,7 @@ class ucp_controller implements ucp_interface
 		// Get the user's data
 		$sql = 'SELECT user_email, user_mtp_pin
 			FROM ' . $this->tables['users'] . '
-			WHERE user_id = ' . $this->user->data['user_id'];
+			WHERE user_id = ' . (int) $this->user->data['user_id'];
 
 		$result = $this->db->sql_query($sql);
 		$row	= $this->db->sql_fetchrow($result);

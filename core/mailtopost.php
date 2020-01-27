@@ -465,7 +465,7 @@ class mailtopost
 					// And now get the post_id
 					$sql = 'SELECT post_id
 						FROM ' . $this->tables['posts'] . '
-							WHERE topic_id = ' . $this->topic_id . '
+							WHERE topic_id = ' . (int) $this->topic_id . '
 						ORDER BY post_id DESC';
 
 					$result 	= $this->db->sql_query($sql);
@@ -522,13 +522,13 @@ class mailtopost
 
 					$sql = 'UPDATE ' . $this->tables['topics'] . '
 						SET ' . $this->db->sql_build_array('UPDATE', $set_topic) . '
-						WHERE topic_id = ' . $this->topic_id;
+						WHERE topic_id = ' . (int) $this->topic_id;
 
 					$this->db->sql_query($sql);
 
 					$sql = 'UPDATE ' . $this->tables['posts'] . '
 						SET ' . $this->db->sql_build_array('UPDATE', $set_post) . '
-						WHERE post_id = ' . $post_id;
+						WHERE post_id = ' . (int) $post_id;
 
 					$this->db->sql_query($sql);
 

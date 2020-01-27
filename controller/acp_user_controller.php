@@ -123,7 +123,7 @@ class acp_user_controller implements acp_user_interface
 					$sql = 'UPDATE ' . $this->tables['users'] . '
 						SET user_mtp_forum = ' . $user_forum . ',
 							user_mtp_pin = "' . $user_pin . '"
-						WHERE user_id = ' . $event['user_id'];
+						WHERE user_id = ' . (int) $event['user_id'];
 
 					$this->db->sql_query($sql);
 				}
@@ -136,7 +136,7 @@ class acp_user_controller implements acp_user_interface
 		// Get the user's data
 		$sql = 'SELECT user_mtp_pin
 			FROM ' . $this->tables['users'] . '
-			WHERE user_id = ' . $event['user_id'];
+			WHERE user_id = ' . (int) $event['user_id'];
 
 		$result 	= $this->db->sql_query($sql);
 		$user_pin	= $this->db->sql_fetchfield('user_mtp_pin');

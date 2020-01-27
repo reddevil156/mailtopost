@@ -66,7 +66,7 @@ class mailtopost_log_prune extends \phpbb\cron\task\base
 		$last_log = time() - ($this->config['mtp_log_days'] * 86400);
 
 		$sql = 'DELETE FROM ' . $this->mailtopost_log_table . '
-			WHERE log_time < ' . $last_log;
+			WHERE log_time < ' . (int) $last_log;
 		$this->db->sql_query($sql);
 
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'MAILTOPOST_LOG_PRUNE_LOG');
