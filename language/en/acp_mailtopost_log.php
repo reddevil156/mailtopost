@@ -58,6 +58,7 @@ $lang = array_merge($lang, array(
 	'NO_DATA'				=> 'No messages to process',
 	'NO_EMAIL'				=> '<strong>User’s email is invalid<strong>',
 	'NO_EMAIL_SIGNATURE'	=> '<strong>The email does not have a dkim signature</strong>',
+	'NO_EMAIL_BODY'			=> 'The message does not have any data',
 	'NO_MESSAGES'			=> 'No messages',
 	'NO_PERMISSION'			=> '<strong>User does not have permission<strong>',
 	'NO_PERM_SET'			=> 'No permissions set',

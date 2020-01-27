@@ -1,2 +1,2 @@
 parameters:
-    david63.mailtopost.tables.mailtopost_log: '%core.table_prefix%mailtopost_log'
+    tables.mailtopost_log: '%core.table_prefix%mailtopost_log'

@@ -1,6 +1,5 @@
 imports:
     - { resource: tables.yml }
-    - { resource: phpbb_tables.yml }
     - { resource: mailtopost_constants.yml }
 
 services:

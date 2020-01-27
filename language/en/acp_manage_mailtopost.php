@@ -103,24 +103,10 @@ $lang = array_merge($lang, array(
 	'MTP_WORKSTATION_EXPLAIN'		=> 'Workstation for NTLM authentication.',
 
 	'NEVER'							=> 'This is currently set not to run',
-	'NEW_VERSION'					=> 'New Version',
-	'NEW_VERSION_EXPLAIN'			=> 'There is a newer version of this extension available.',
 	'NO_FORUM_SET'					=> 'A default forum has not been set.',
 	'NO_PERMISSIONS_SET'			=> 'No user permissions have been set for this extension.',
 
 	'POST_OPTIONS'					=> 'Post options',
 
-	'VERSION'						=> 'Version',
-
 	'WARNING'						=> 'Warning'
-));
-
-// Donate
-$lang = array_merge($lang, array(
-	'DONATE'					=> 'Donate',
-	'DONATE_EXTENSIONS'			=> 'Donate to my extensions',
-	'DONATE_EXTENSIONS_EXPLAIN'	=> 'This extension, as with all of my extensions, is totally free of charge. If you have benefited from using it then please consider making a donation by clicking the PayPal donation button opposite - I would appreciate it. I promise that there will be no spam nor requests for further donations, although they would always be welcome.',
-
-	'PAYPAL_BUTTON'				=> 'Donate with PayPal button',
-	'PAYPAL_TITLE'				=> 'PayPal - The safer, easier way to pay online!',
 ));

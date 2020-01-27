@@ -126,6 +126,8 @@ class log_controller implements log_interface
 		$marked		= $this->request->variable('mark', array(0));
 		$start		= $this->request->variable('start', 0);
 
+		$back = false;
+
 		// Sort keys
 		$sort_days	= $this->request->variable('st', 0);
 		$sort_dir	= $this->request->variable('sd', 'd');
@@ -184,15 +186,20 @@ class log_controller implements log_interface
 		$this->db->sql_freeresult($result);
 
 		// Template vars for header panel
+		$version_data	= $this->functions->version_check();
+
 		$this->template->assign_vars(array(
+			'DOWNLOAD'			=> (array_key_exists('download', $version_data)) ? '<a class="download" href =' . $version_data['download'] . '>' . $this->language->lang('NEW_VERSION_LINK') . '</a>' : '',
+
 			'HEAD_TITLE'		=> $this->language->lang('MTP_LOG'),
 			'HEAD_DESCRIPTION'	=> $this->language->lang('MTP_LOG_EXPLAIN'),
 
 			'NAMESPACE'			=> $this->functions->get_ext_namespace('twig'),
 
-			'S_PERM_SET'		=> $this->functions->get_perms_count(),
+			'S_BACK'			=> $back,
+			'S_VERSION_CHECK'	=> (array_key_exists('current', $version_data)) ? $version_data['current'] : false,
 
-			'VERSION_NUMBER'	=> $this->functions->get_this_version(),
+			'VERSION_NUMBER'	=> $this->functions->get_meta('version'),
 		));
 
 		$this->template->assign_vars(array(

@@ -123,6 +123,7 @@ class admin_actions_controller implements admin_actions_interface
 
 		$mailtopost_message = '';
 		$messages = 0;
+		$back = false;
 
 		// Is the Cron unlock form being submitted?
 		if ($this->request->is_set_post('cron_unlock'))
@@ -199,16 +200,20 @@ class admin_actions_controller implements admin_actions_interface
 		$this->pop3->CloseConnection();
 
 		// Template vars for header panel
+		$version_data	= $this->functions->version_check();
+
 		$this->template->assign_vars(array(
+			'DOWNLOAD'			=> (array_key_exists('download', $version_data)) ? '<a class="download" href =' . $version_data['download'] . '>' . $this->language->lang('NEW_VERSION_LINK') . '</a>' : '',
+
 			'HEAD_TITLE'		=> $this->language->lang('MAIL_TO_POST_TOOLS'),
 			'HEAD_DESCRIPTION'	=> $this->language->lang('MAIL_TO_POST_TOOLS_EXPLAIN'),
 
 			'NAMESPACE'			=> $this->functions->get_ext_namespace('twig'),
 
-			'S_PERM_SET'		=> $this->functions->get_perms_count(),
-			'S_VERSION_CHECK'	=> $this->functions->version_check(),
+			'S_BACK'			=> $back,
+			'S_VERSION_CHECK'	=> (array_key_exists('current', $version_data)) ? $version_data['current'] : false,
 
-			'VERSION_NUMBER'	=> $this->functions->get_this_version(),
+			'VERSION_NUMBER'	=> $this->functions->get_meta('version'),
 		));
 
 		$this->template->assign_vars(array(

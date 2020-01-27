@@ -243,22 +243,33 @@ class mailtopost
 						continue;
 					}
 
-					// Need to trap images as we cannot post them
-					if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'image') !== false)
+					if ($decoded[0]['Parts'][1]['Headers']['content-type:'])
 					{
-						$this->error_routine($message, 'IMAGE_ERROR');
-						continue;
-					}
+						// Need to trap images as we cannot post them
+						if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'image') !== false)
+						{
+							$this->error_routine($message, 'IMAGE_ERROR');
+							continue;
+						}
 
-					// Also trap attachments as we cannot post them
-					if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'application') !== false)
-					{
-						$this->error_routine($message, 'ATTACHMENT_ERROR');
-						continue;
+						// Also trap attachments as we cannot post them
+						if (strpos($decoded[0]['Parts'][1]['Headers']['content-type:'], 'application') !== false)
+						{
+							$this->error_routine($message, 'ATTACHMENT_ERROR');
+							continue;
+						}
 					}
 
 					// Now we can get the mail body
-					$mail_body = $decoded[0]['Parts'][0]['Body'];
+					if ($decoded[0]['Parts'][0]['Body'])
+					{
+						$mail_body = $decoded[0]['Parts'][0]['Body'];
+					}
+					else
+					{
+						$this->error_routine($message, 'NO_EMAIL_BODY');
+						continue;
+					}
 
 					// Get the user's data
 					$sql = 'SELECT user_id, username, user_email, user_colour, user_mtp_forum, user_mtp_pin

@@ -37,7 +37,6 @@ Buttons
 .large-button {
     color: #3300CC;
     padding: 20px 30px 20px;
-    font-size: 16px;
     cursor: pointer;
     font-size: 20px;
 	background: linear-gradient(to bottom, #6B6B6B 5%, #bab1ba 100%);
@@ -101,6 +100,24 @@ hr {
 	border: 1px solid #BFBFBF;
 	border-radius: 0.5em;
 	background-color: #C8C7C4;
+}
+
+pre {
+	font-size: 12px;
+}
+
+a.copy {
+	font-size: 12px;
+	text-align: right;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #0000CC;
+	padding: 4px 50px 0 50px;
+	margin-top: 5px;
+}
+
+.compare-highlight {
+	background-color: #FFFF33;
 }
 
 
@@ -293,7 +310,7 @@ Pagination
 /* ---------
 Panels
 --------- */
-.head-panel, .head-panel-error, .head-panel-version {
+.head-panel, .head-panel-error, .head-panel-version, .head-panel-noversion {
 	width: auto;
 	height: auto;
 	border-radius: 1em;
@@ -310,7 +327,7 @@ Panels
 	background-color: #ffffff;
 }
 
-.head-panel-error, .head-panel-version {
+.head-panel-error, .head-panel-version, .head-panel-noversion {
 	color: #FFFFFF;
 	text-align: center;
 }
@@ -321,6 +338,10 @@ Panels
 
 .head-panel-version {
 	background-color: #228822;
+}
+
+.head-panel-noversion {
+	background-color: #546CED;
 }
 
 .head-title {
@@ -334,6 +355,13 @@ Panels
 	margin-bottom: 0.7em;
 	line-height: 1.40em;
 	font-size: 0.90em;
+}
+
+.head-description .download {
+	color: #FFFF66;
+	text-decoration: none;
+	font-size: 1.2em;
+	font-weight: bold;
 }
 
 fieldset {
@@ -396,7 +424,7 @@ Tables
 	display: table-header-group;
 }
 
-.table-header-cell, .table-header-cell-left, .table-header-cell-right, .table-header-cell-narrow, .table-header-cell-wide, .table-header-cell-select {
+.table-header-cell, .table-header-cell-left, .table-header-cell-narrow-left, .table-header-cell-right, .table-header-cell-narrow, .table-header-cell-wide, .table-header-cell-select {
 	display: table-cell;
 	padding: 4px 5px;
 	color: #FFFFFF;
@@ -411,7 +439,7 @@ Tables
 	font-weight: bold;
 }
 
-.rtl .table-header-cell, .rtl .table-header-cell-left, .rtl .table-header-cell-right, .rtl .table-header-cell-select {
+.rtl .table-header-cell, .rtl .table-header-cell-left, .rtl .table-header-cell-narrow-left, .rtl .table-header-cell-right, .rtl .table-header-cell-select {
 	text-align: right;
 }
 
@@ -419,9 +447,20 @@ Tables
 	border-top-left-radius: 1em;
 }
 
+.table-header-cell-narrow-left {
+	border-top-left-radius: 1em;
+	width: 10px;
+}
+
 .rtl .table-header-cell-left {
 	border-top-right-radius: 1em;
 	border-top-left-radius: 0;
+}
+
+.rtl .table-header-cell-narrow-left {
+	border-top-right-radius: 1em;
+	border-top-left-radius: 0;
+	width: 10px;
 }
 
 .table-header-cell-right {
@@ -473,7 +512,6 @@ Tables
 	width: auto !important;
 	min-width: inherit;
 	background-color: #F9F9F9;
-	margin: auto;
 	display: table-row;
 	position: relative;
 }
@@ -524,6 +562,12 @@ Tables
 .table-body-cell-right {
 	text-align: right;
 	padding: 4px 5px 4px 0;
+}
+
+.table-body-cell-tiny {
+	width: 10px;
+	text-align: center;
+	padding: 0;
 }
 
 .shaded {
@@ -631,7 +675,7 @@ PayPal button
 	font-style: italic;
 	font-weight: bold;
 	font-size: 22px;
-	box-shadow: 0.2em 0.2em 0em 0em #899599;
+	box-shadow: 0.2em 0.2em 0 0 #899599;
 }
 
 .paypal_btn:hover {
@@ -658,6 +702,7 @@ td.showkey {
 tr.rowkey {
 	display: none;
 }
+
 
 /* ---------
 * disableext
