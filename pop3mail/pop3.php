@@ -295,7 +295,7 @@ class pop3
 				}
 				else
 				{
-					$mechanisms=array();
+					$mechanisms=[];
 					if ($this->PutLine("CAPA")==0)
 					{
 						return ($this->SetError("Could not send the CAPA command"));
@@ -513,7 +513,7 @@ class pop3
 		}
 		if ($message=="")
 		{
-			for ($messages=array();;)
+			for ($messages=[];;)
 			{
 				$response=$this->GetLine();
 				if (gettype($response)!="string")
@@ -579,7 +579,7 @@ class pop3
 		{
 			return ($this->SetError("Could not retrieve the message: ".$this->Tokenize("\r\n")));
 		}
-		for ($headers=$body=array(),$line=0;;)
+		for ($headers=$body=[],$line=0;;)
 		{
 			$response=$this->GetLine();
 			if (gettype($response)!="string")
@@ -803,7 +803,7 @@ class pop3
 
 	function &SetConnection($set, &$current_name, &$pop3)
 	{
-		static $connections = array();
+		static $connections = [];
 
 		if ($set>0)
 		{

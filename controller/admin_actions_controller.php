@@ -111,8 +111,7 @@ class admin_actions_controller implements admin_actions_interface
 	public function actions()
 	{
 		// Add the language files
-		$this->language->add_lang('acp_tools_mailtopost', $this->functions->get_ext_namespace());
-		$this->language->add_lang('acp_mailtopost_log', $this->functions->get_ext_namespace());
+		$this->language->add_lang(array('acp_tools_mailtopost', 'acp_mailtopost_log', $this->functions->get_ext_namespace()));
 
 		// Make sure debug is turned off
 		$this->pop3->debug = $this->pop3->html_debug = 0;

@@ -116,8 +116,7 @@ class log_controller implements log_interface
 	public function display_output()
 	{
 		// Add the language files
-		$this->language->add_lang('acp_log_mailtopost', $this->functions->get_ext_namespace());
-		$this->language->add_lang('acp_mailtopost_log', $this->functions->get_ext_namespace());
+		$this->language->add_lang(array('acp_log_mailtopost', 'acp_mailtopost_log'), $this->functions->get_ext_namespace());
 
 		// Start initial var setup
 		$action		= $this->request->variable('action', '');

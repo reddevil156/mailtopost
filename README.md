@@ -2,12 +2,16 @@
 
 Adds a feature to receive posts via an email.
 
-[![Build Status](https://travis-ci.com/david63/mailtopost.svg?branch=master)](https://travis-ci.com/david63/mailtopost)
+[![Build Status](https://github.com/david63/mailtopost/workflows/Tests/badge.svg)](https://github.com/phpbb-extensions/david63/mailtopost)
 [![License](https://poser.pugx.org/david63/mailtopost/license)](https://packagist.org/packages/david63/mailtopost)
 [![Latest Stable Version](https://poser.pugx.org/david63/mailtopost/v/stable)](https://packagist.org/packages/david63/mailtopost)
 [![Latest Unstable Version](https://poser.pugx.org/david63/mailtopost/v/unstable)](https://packagist.org/packages/david63/mailtopost)
 [![Total Downloads](https://poser.pugx.org/david63/mailtopost/downloads)](https://packagist.org/packages/david63/mailtopost)
+[![codecov](https://codecov.io/gh/david63/mailtopost/branch/master/graph/badge.svg?token=D2500PgRex)](https://codecov.io/gh/david63/mailtopost)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f24d3d3994fd493d9405e6b285e46905)](https://www.codacy.com/manual/david63/mailtopost?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=david63/mailtopost&amp;utm_campaign=Badge_Grade)
+
+[![Compatible](https://img.shields.io/badge/compatible-phpBB:3.2.x-blue.svg)](https://shields.io/)
+[![Compatible](https://img.shields.io/badge/compatible-phpBB:3.3.x-blue.svg)](https://shields.io/)
 
 ## Minimum Requirements
 * phpBB 3.3.0

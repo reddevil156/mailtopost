@@ -445,7 +445,7 @@ class mailtopost
 					}
 
 					// Only here to not break "submit_post()"
-					$poll_data = array();
+					$poll_data = [];
 
 					$url = submit_post($mode, $this->mail_subject, $this->username, POST_NORMAL, $poll_data, $this->post_data);
 

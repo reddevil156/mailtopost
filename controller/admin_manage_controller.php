@@ -88,8 +88,7 @@ class admin_manage_controller implements admin_manage_interface
 	public function display_options()
 	{
 		// Add the language files
-		$this->language->add_lang('acp_manage_mailtopost', $this->functions->get_ext_namespace());
-		$this->language->add_lang('acp_common', $this->functions->get_ext_namespace());
+		$this->language->add_lang(array('acp_manage_mailtopost', 'acp_common'), $this->functions->get_ext_namespace());
 
 		// Create a form key for preventing CSRF attacks
 		add_form_key($this->constants['form_key']);

@@ -67,19 +67,19 @@ class mime_parser
 	);
 	var $message_buffer_length = 8000;
 	var $ignore_syntax_errors = 1;
-	var $warnings = array();
+	var $warnings = [];
 	var $track_lines = 0;
 	var $use_part_file_names = 0;
-	var $custom_mime_types = array();
+	var $custom_mime_types = [];
 
 	/* Private variables */
 	var $state = MIME_PARSER_START;
 	var $buffer = '';
 	var $buffer_position = 0;
 	var $offset = 0;
-	var $parts = array();
+	var $parts = [];
 	var $part_position = 0;
-	var $headers = array();
+	var $headers = [];
 	var $body_parser;
 	var $body_parser_state = MIME_PARSER_BODY_DONE;
 	var $body_buffer = '';
@@ -91,7 +91,7 @@ class mime_parser
 	var $position = 0;
 	var $body_part_number = 1;
 	var $next_token = '';
-	var $lines = array();
+	var $lines = [];
 	var $line_offset = 0;
 	var $last_line = 1;
 	var $last_carriage_return = 0;
@@ -144,9 +144,9 @@ class mime_parser
 		$this->buffer = '';
 		$this->buffer_position = 0;
 		$this->offset = 0;
-		$this->parts = array();
+		$this->parts = [];
 		$this->part_position = 0;
-		$this->headers = array();
+		$this->headers = [];
 		$this->body_parser_state = MIME_PARSER_BODY_DONE;
 		$this->body_buffer = '';
 		$this->body_buffer_position = 0;
@@ -155,7 +155,7 @@ class mime_parser
 		$this->position = 0;
 		$this->body_part_number = 1;
 		$this->next_token = '';
-		$this->lines = ($this->track_lines ? array(0 => 0) : array());
+		$this->lines = ($this->track_lines ? array(0 => 0) : []);
 		$this->line_offset = 0;
 		$this->last_line = 0;
 		$this->last_carriage_return = 0;
@@ -191,7 +191,7 @@ class mime_parser
 	{
 		$type = strtolower(trim($this->Tokenize($value, ';')));
 		$p = trim($this->Tokenize(''));
-		$parameters = $character_sets = $languages = array();
+		$parameters = $character_sets = $languages = [];
 		while (strlen($p))
 		{
 			$parameter = trim(strtolower($this->Tokenize($p, '=')));
@@ -298,7 +298,7 @@ class mime_parser
 	function ParseHeaderString($body, &$position, &$headers)
 	{
 		$l = strlen($body);
-		$headers = array();
+		$headers = [];
 		while ($position < $l)
 		{
 			if ($this->FindStringLineBreak($body, $position, $break, $line_break))
@@ -626,7 +626,7 @@ class mime_parser
 	{
 		$first = strtolower(trim(strtok($value, ';')));
 		$values = trim(strtok(''));
-		$parameters = array();
+		$parameters = [];
 		$return_value = '';
 		while (strlen($values))
 		{
@@ -681,7 +681,7 @@ class mime_parser
 		switch ($part['Type'])
 		{
 			case 'MessageStart':
-				$this->headers=array();
+				$this->headers=[];
 				break;
 			case 'HeaderName':
 				if ($this->decode_bodies)
@@ -694,7 +694,7 @@ class mime_parser
 				{
 					$value = $part['Value'];
 					$error = '';
-					for ($decoded_header = array(), $position = 0; $position<strlen($value);)
+					for ($decoded_header = [], $position = 0; $position<strlen($value);)
 					{
 						if (gettype($encoded = strpos($value,'=?', $position))!='integer')
 						{
@@ -1202,8 +1202,8 @@ class mime_parser
 					{
 						case 'MessageStart':
 							$decoded=array(
-								'Headers'=>array(),
-								'Parts'=>array(),
+								'Headers'=>[],
+								'Parts'=>[],
 								'Position'=>$this->message_position,
 							);
 							$end_of_message = 0;
@@ -1565,7 +1565,7 @@ class mime_parser
 			if ($this->part_position)
 			{
 				$this->part_position = 0;
-				$this->parts = array();
+				$this->parts = [];
 			}
 		}
 		else
@@ -1593,7 +1593,7 @@ class mime_parser
 		{
 			return ($this->SetError('it was not specified a valid message to decode'));
 		}
-		$this->warnings = $decoded = array();
+		$this->warnings = $decoded = [];
 		$this->ResetParserState();
 
 		$addresses = new rfc822_addresses;
@@ -1603,7 +1603,7 @@ class mime_parser
 			if ($this->extract_addresses)
 			{
 				$headers = $decoded_message['Headers'];
-				$positions = (isset($decoded_message['HeaderPositions']) ? $decoded_message['HeaderPositions'] : array());
+				$positions = (isset($decoded_message['HeaderPositions']) ? $decoded_message['HeaderPositions'] : []);
 				$th = count($headers);
 				for (Reset($headers), $h = 0; $h<$th; Next($headers), ++$h)
 				{
@@ -1678,7 +1678,7 @@ class mime_parser
 			$parser->ignore_syntax_errors = $this->ignore_syntax_errors;
 			$values = (gettype($message['Headers'][$header]) == 'array' ? $message['Headers'][$header] : array($message['Headers'][$header]));
 			$tv = count($values);
-			$addresses = array();
+			$addresses = [];
 			for ($v = 0; $v<$tv; ++$v)
 			{
 				if ($parser->ParseAddressList($values[$v], $a))
@@ -1743,7 +1743,7 @@ class mime_parser
 
 	function Analyze($message, &$results)
 	{
-		$results = array();
+		$results = [];
 		if (!isset($message['Headers']['content-type:']))
 		{
 			$content_type = 'text/plain';
@@ -1776,7 +1776,7 @@ class mime_parser
 				{
 					return ($this->SetError($this->decode_bodies ? 'No parts were found in the '.$content_type.' part message' : 'It is not possible to analyze multipart messages without parsing the contained message parts. Please set the decode_bodies variable to 1 before parsing the message'));
 				}
-				$parts = array();
+				$parts = [];
 				for ($p = 0; $p < $lp; ++$p)
 				{
 					if (!$this->Analyze($message['Parts'][$p], $parts[$p]))
@@ -1913,7 +1913,7 @@ class mime_parser
 
 					case 'form-data':
 						$results['Type'] = 'form-data';
-						$results['FormData'] = array();
+						$results['FormData'] = [];
 						for ($p = 0; $p < $lp; ++$p)
 						{
 							if (!isset($message['Parts'][$p]['Headers']['content-disposition:']))
@@ -2059,7 +2059,7 @@ class mime_parser
 						{
 							$position = 0;
 							$this->ParseHeaderString($body, $position, $headers);
-							$recipients = array();
+							$recipients = [];
 							while ($position < $l)
 							{
 								$this->ParseHeaderString($body, $position, $headers);

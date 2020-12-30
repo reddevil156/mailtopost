@@ -33,7 +33,7 @@ class rfc822_addresses
 	var $error = '';
 	var $error_position = -1;
 	var $ignore_syntax_errors = 1;
-	var $warnings = array();
+	var $warnings = [];
 
 	/* Private functions */
 
@@ -886,7 +886,7 @@ class rfc822_addresses
 			{
 				return (0);
 			}
-			$mailbox_group = array();
+			$mailbox_group = [];
 		}
 		if ($g >= $l || strcmp($v[$g], ';'))
 		{
@@ -938,8 +938,8 @@ class rfc822_addresses
 
 	function ParseAddressList($value, &$addresses)
 	{
-		$this->warnings = array();
-		$addresses = array();
+		$this->warnings = [];
+		$addresses = [];
 		$this->v = $v = $value;
 		$l = strlen($v);
 		$p = 0;

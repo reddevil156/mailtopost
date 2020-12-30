@@ -150,3 +150,6 @@ services:
     david63.mailtopost.pop3mail.rfc822_addresses:
         class: david63\mailtopost\pop3mail\rfc822_addresses
         arguments:
+
+    _defaults:
+        public: true
