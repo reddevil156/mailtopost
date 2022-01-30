@@ -332,7 +332,7 @@ class mailtopost
 					}
 
 					// Has the user changed the default PIN?
-					if ($user_pin === $this->constants['default_user_pin'])
+					if ($this->config['mtp_pin'] &&  ($user_pin === $this->constants['default_user_pin']))
 					{
 						// Just report this in the log
 						$this->error_routine($message, 'DEFAULT_PIN', false);
